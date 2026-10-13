@@ -1,0 +1,10 @@
+__pycache__/
+*.pyc
+.DS_Store
+videos/
+loops/
+assets/clips/
+*.mp4
+*.wav
+.env
+*.env

@@ -1,0 +1,421 @@
+<!doctype html>
+<html><head><meta charset="utf-8"><title>CNC 工廠數位孿生 · ICMA Lab</title>
+<link rel="stylesheet" href="_runtime/runtime.css">
+<style>
+@font-face{font-family:"Manrope";src:url("assets/fonts/manrope.woff2") format("woff2");font-weight:200 800;font-display:block}
+:root{
+  --bg1:#15222a; --bg2:#0f171b; --bg3:#0a1013;
+  --cream:#e6eeec; --gold:#87ddbb; --champ:#a8c9c0; --rose:#ef806c; --mint:#87ddbb; --amber:#edc779; --blue:#91bff5; --muted:#8fa4a9;
+  --line:rgba(135,221,187,.26); --glow-rgb:135,221,187;
+  --sans:"Manrope","Noto Sans CJK TC","Noto Sans TC",sans-serif;
+}
+body{font-family:var(--sans)}
+.h1,.h2,.serif,#chrome .brandmark{font-family:var(--sans)!important}
+.num{font-family:"Manrope","Noto Sans CJK TC",sans-serif}
+#chrome .brandmark{font-weight:800;letter-spacing:.04em}
+#chrome .eventmark{font-weight:600}
+#subbox{background:rgba(8,14,17,.72);font-family:var(--sans)}
+#subbox b{color:var(--mint)}
+
+/* ── footage ── */
+.clip{position:absolute;left:0;top:0;width:1920px;height:1080px;overflow:hidden;opacity:0}
+.clip img{position:absolute;left:0;top:0;width:1920px;height:1080px;display:block;transform-origin:50% 50%}
+.shade{position:absolute;inset:0;pointer-events:none}
+#topfade{position:absolute;left:0;top:0;width:1920px;height:200px;background:linear-gradient(180deg,rgba(8,13,16,.85),transparent);z-index:15;opacity:0}
+#botfade{position:absolute;left:0;bottom:0;width:1920px;height:260px;background:linear-gradient(0deg,rgba(8,13,16,.8),transparent);z-index:15;opacity:0}
+#demoTag{left:72px;top:112px;z-index:16;font-size:19px;letter-spacing:.12em;color:var(--muted);display:flex;align-items:center;gap:10px;opacity:0}
+#demoTag i{width:8px;height:8px;border-radius:50%;background:var(--mint);box-shadow:0 0 10px var(--mint);display:block}
+
+/* ── generic overlays ── */
+.tag{position:absolute;z-index:17;display:inline-flex;align-items:center;gap:14px;padding:14px 26px 14px 22px;border-radius:14px;background:rgba(10,18,21,.78);border:1px solid var(--line);backdrop-filter:blur(14px);font-size:30px;font-weight:700;white-space:nowrap;opacity:0;box-shadow:0 20px 50px rgba(0,0,0,.4)}
+.tag i{width:12px;height:12px;border-radius:50%;background:var(--mint);box-shadow:0 0 14px var(--mint);display:block}
+.tag small{font-size:20px;font-weight:600;color:var(--muted);letter-spacing:.14em;margin-right:4px}
+.tag.coral i{background:var(--rose);box-shadow:0 0 14px var(--rose)}
+.tag.amber i{background:var(--amber);box-shadow:0 0 14px var(--amber)}
+.tag.blue i{background:var(--blue);box-shadow:0 0 14px var(--blue)}
+.kin{position:absolute;z-index:17;font-weight:800;line-height:1.08;letter-spacing:-.01em}
+.kin .w{display:block;opacity:0}
+.mint{color:var(--mint)} .coralc{color:var(--rose)} .amberc{color:var(--amber)} .bluec{color:var(--blue)}
+
+/* S1 hook */
+#grid{position:absolute;inset:0;opacity:0;background-image:linear-gradient(rgba(135,221,187,.06) 1px,transparent 1px),linear-gradient(90deg,rgba(135,221,187,.06) 1px,transparent 1px);background-size:80px 80px;-webkit-mask-image:radial-gradient(ellipse 70% 60% at 50% 50%,#000 30%,transparent 80%)}
+#bill{left:500px;top:300px;width:920px;padding:48px 56px 44px;opacity:0}
+#bill .eb{font-size:22px;letter-spacing:.28em;color:var(--champ);font-weight:700}
+#bill .amt{display:flex;align-items:baseline;gap:18px;margin-top:22px}
+#bill .cur{font-size:44px;color:var(--muted);font-weight:700}
+#bill .big{font-size:140px;font-weight:800;letter-spacing:-.03em;line-height:1}
+#bill .rule{height:1px;background:var(--line);margin:30px 0 22px}
+#bill .ft{display:flex;justify-content:space-between;font-size:24px;color:var(--muted)}
+#q1{left:150px;top:210px} #q2{left:1450px;top:420px} #q3{left:330px;top:730px}
+.q{font-size:36px!important;padding:20px 32px 20px 26px!important}
+.q b{font-size:26px;font-weight:800;color:var(--amber);border:1.5px solid currentColor;border-radius:8px;padding:2px 9px;margin-right:4px}
+#q1 b{color:var(--blue)} #q3 b{color:var(--mint)}
+#blind{left:0;width:1920px;top:430px;text-align:center;font-size:150px;opacity:0}
+
+/* S2 reveal */
+#heroShade{background:linear-gradient(90deg,rgba(8,13,16,.88) 0%,rgba(8,13,16,.55) 38%,rgba(8,13,16,0) 70%)}
+#k1{left:110px;top:360px;font-size:108px}
+#title{position:absolute;left:0;width:1920px;top:330px;text-align:center;z-index:17}
+#title .eb{font-size:26px;letter-spacing:.42em;color:var(--mint);font-weight:700;opacity:0}
+#title .t{font-size:150px;font-weight:800;margin-top:22px;letter-spacing:-.01em;opacity:0}
+#title .s{font-size:30px;letter-spacing:.32em;color:var(--champ);margin-top:22px;font-weight:600;opacity:0}
+#titleShade{background:radial-gradient(ellipse 60% 55% at 50% 50%,rgba(8,13,16,.82),rgba(8,13,16,.55));opacity:0}
+
+/* S3 production */
+#win{left:240px;top:190px;width:1440px;height:858px;opacity:0;perspective:2000px;z-index:5}
+#win .frame{width:1440px;height:858px;border-radius:20px;overflow:hidden;background:#11191d;box-shadow:0 60px 120px rgba(0,0,0,.6),0 0 0 1px rgba(135,221,187,.18);position:relative}
+#win .bar{height:48px;background:#0c1316;display:flex;align-items:center;gap:10px;padding:0 20px;border-bottom:1px solid #22313a}
+#win .bar i{width:13px;height:13px;border-radius:50%;background:#3a4a52;display:block}
+#win .bar .u{margin-left:18px;width:520px;height:28px;border-radius:14px;background:#17242a;color:#7f969c;font-size:16px;display:flex;align-items:center;padding:0 16px}
+#win .vp{position:relative;width:1440px;height:810px;overflow:hidden}
+#win .vp img{width:1440px;height:810px;display:block}
+#chipsS3{left:240px;top:118px;display:flex;gap:18px;z-index:18}
+#chipsS3 .tag{position:relative}
+.callout{position:absolute;z-index:17;opacity:0}
+.callout .lb{font-size:34px;font-weight:800;white-space:nowrap;padding-left:22px;border-left:3px solid var(--mint)}
+.callout .lb small{display:block;font-size:20px;font-weight:600;color:var(--muted);letter-spacing:.18em;margin-bottom:6px}
+#co1{left:800px;top:380px} #co2{left:800px;top:520px} #co3{left:800px;top:660px}
+#coShade{position:absolute;left:0;top:0;width:1300px;height:1080px;background:linear-gradient(90deg,rgba(8,13,16,.85),rgba(8,13,16,.5) 70%,transparent);opacity:0;z-index:16}
+
+/* S4 energy */
+#legend{left:72px;top:820px;display:flex;gap:16px;z-index:17}
+#legend .tag{position:relative;font-size:26px}
+#formula{left:110px;top:640px;padding:34px 44px;opacity:0;z-index:17}
+#formula .eb{font-size:20px;letter-spacing:.3em;color:var(--champ);font-weight:700}
+#formula .eq{font-size:52px;font-weight:800;margin-top:14px;white-space:nowrap}
+#formula .eq span{color:var(--muted);font-weight:600;margin:0 14px}
+
+/* S5 scenarios */
+#k2{left:0;width:1920px;top:360px;text-align:center;font-size:170px}
+#dimAll{position:absolute;inset:0;background:rgba(8,13,16,.72);backdrop-filter:blur(10px);opacity:0;z-index:16}
+
+/* S6 carbon */
+#eqC{left:110px;top:600px;padding:36px 46px;opacity:0;z-index:17}
+#eqC .eb{font-size:20px;letter-spacing:.3em;color:var(--champ);font-weight:700}
+#eqC .eq{font-size:50px;font-weight:800;margin-top:14px;white-space:nowrap}
+#eqC .eq span{color:var(--muted);font-weight:600;margin:0 12px}
+#eqC .foot{margin-top:16px;font-size:20px}
+#trio{left:250px;top:330px;width:1420px;display:flex;gap:36px;z-index:17}
+.tc{flex:1;padding:40px 40px 36px;opacity:0}
+.tc .ix{font-size:20px;letter-spacing:.24em;color:var(--champ);font-weight:700}
+.tc .ti{font-size:64px;font-weight:800;margin-top:14px}
+.tc .su{font-size:26px;color:var(--muted);margin-top:10px}
+.tc .bar2{height:6px;border-radius:3px;margin-top:28px;background:rgba(255,255,255,.08);overflow:hidden}
+.tc .bar2 i{display:block;height:100%;width:0}
+#tc1 .bar2 i{background:var(--mint)} #tc2 .bar2 i{background:var(--blue)} #tc3 .bar2 i{background:var(--amber)}
+#oneScreen{left:0;width:1920px;top:690px;text-align:center;font-size:56px;font-weight:800;opacity:0;z-index:17}
+
+/* S7 scale / IoT */
+#iot{position:absolute;inset:0;opacity:0;z-index:12}
+#iot .eb{position:absolute;left:0;width:1920px;top:160px;text-align:center;font-size:24px;letter-spacing:.4em;color:var(--mint);font-weight:700}
+#iot svg{position:absolute;left:0;top:0}
+.src{position:absolute;left:170px;width:400px;padding:26px 30px;display:flex;align-items:center;gap:20px;opacity:0}
+.src .ic{width:58px;height:58px;border-radius:14px;border:1.5px solid var(--line);display:flex;align-items:center;justify-content:center;font-size:20px;font-weight:800;color:var(--mint);flex:none}
+.src .tx{font-size:32px;font-weight:700}
+.src .tx small{display:block;font-size:19px;color:var(--muted);font-weight:600;letter-spacing:.08em;margin-top:4px}
+#src1{top:262px} #src2{top:402px} #src3{top:542px} #src4{top:682px}
+#gw{left:790px;top:440px;width:340px;padding:30px;text-align:center;opacity:0}
+#gw .tx{font-size:36px;font-weight:800} #gw small{display:block;font-size:20px;color:var(--muted);margin-top:8px;letter-spacing:.1em}
+#twin{left:1340px;top:330px;width:440px;padding:22px;opacity:0}
+#twin .thumb{width:396px;height:223px;border-radius:12px;overflow:hidden;position:relative}
+#twin .thumb img{width:396px;height:223px;object-fit:cover;display:block;transform:scale(1.35)}
+#twin .tx{font-size:34px;font-weight:800;margin-top:18px}
+#twin small{display:block;font-size:20px;color:var(--muted);margin-top:6px}
+#twin .live{position:absolute;right:36px;top:36px;font-size:18px;font-weight:800;letter-spacing:.14em;color:#0d1a16;background:var(--mint);padding:5px 12px;border-radius:6px;opacity:0}
+
+/* S8 close */
+#k3{left:0;width:1920px;top:370px;text-align:center;font-size:160px}
+#logo{position:absolute;left:0;width:1920px;top:290px;text-align:center;z-index:17}
+#logo .mark{display:inline-flex;align-items:center;gap:34px;opacity:0}
+#logo .glyph{width:120px;height:120px;border-radius:30px;background:linear-gradient(145deg,#a5ecd0,#5fbf9a);display:flex;align-items:center;justify-content:center;box-shadow:0 0 60px rgba(135,221,187,.45)}
+#logo .name{font-size:140px;font-weight:800;letter-spacing:-.02em}
+#logo .cn{font-size:34px;color:var(--champ);letter-spacing:.3em;margin-top:26px;font-weight:600;opacity:0}
+#logo .line{width:0;height:2px;background:var(--mint);margin:46px auto 40px;box-shadow:0 0 12px var(--mint)}
+#logo .tl{font-size:54px;font-weight:800;opacity:0}
+#logo .ft{font-size:20px;color:var(--muted);margin-top:40px;letter-spacing:.14em;opacity:0}
+#flash{position:absolute;inset:0;background:radial-gradient(circle at 50% 50%,rgba(135,221,187,.35),transparent 60%);opacity:0;z-index:19;pointer-events:none}
+#bill,#formula,#eqC,#gw,#twin,.src{position:absolute!important}
+#formula,#eqC{background:rgba(10,18,21,.84)!important}
+#formula .eq span,#eqC .eq span{color:#b9cbcf!important}
+</style></head>
+<body>
+<div id="stage">
+  <div id="grid"></div>
+
+  <!-- footage layers -->
+  <div id="c_hero" class="clip"><img data-clip="hero" data-n="255" src="assets/clips/hero/0000.jpg"><div id="heroShade" class="shade"></div><div id="titleShade" class="shade"></div></div>
+  <div id="c_interior" class="clip"><img data-clip="interior" data-n="255" src="assets/clips/interior/0000.jpg"></div>
+  <div id="c_select" class="clip"><img data-clip="select" data-n="240" src="assets/clips/select/0000.jpg"></div>
+  <div id="c_power" class="clip"><img data-clip="power" data-n="255" src="assets/clips/power/0000.jpg"></div>
+  <div id="c_solar" class="clip"><img data-clip="solar" data-n="255" src="assets/clips/solar/0000.jpg"><div class="shade" style="background:linear-gradient(90deg,rgba(8,13,16,.6),transparent 55%)"></div></div>
+  <div id="c_cloud" class="clip"><img data-clip="cloud" data-n="240" src="assets/clips/cloud/0000.jpg"></div>
+  <div id="c_fault" class="clip"><img data-clip="fault" data-n="240" src="assets/clips/fault/0000.jpg"></div>
+  <div id="c_carbon" class="clip"><img data-clip="carbon" data-n="255" src="assets/clips/carbon/0000.jpg"><div class="shade" style="background:linear-gradient(90deg,rgba(8,13,16,.65),transparent 55%)"></div></div>
+  <div id="c_ui2" class="clip"><img data-clip="ui" data-n="240" src="assets/clips/ui/0000.jpg"></div>
+  <div id="c_add" class="clip"><img data-clip="add" data-n="270" src="assets/clips/add/0000.jpg"></div>
+
+  <div id="win" class="abs"><div class="frame"><div class="bar"><i></i><i></i><i></i><div class="u">factory-twin · CNC 示範工廠</div></div><div class="vp"><img data-clip="ui" data-n="240" src="assets/clips/ui/0000.jpg"></div></div></div>
+
+  <div id="topfade"></div><div id="botfade"></div>
+  <div id="demoTag" class="abs"><i></i>展示畫面 · 模擬資料</div>
+  <div id="coShade"></div>
+
+  <!-- S1 -->
+  <div id="bill" class="abs glass">
+    <div class="eb">ELECTRICITY BILL · 本月電費</div>
+    <div class="amt"><span class="cur">NT$</span><span class="big num" id="billNum">0</span></div>
+    <div class="rule"></div>
+    <div class="ft"><span>合計應繳金額</span><span>明細：無</span></div>
+  </div>
+  <div id="q1" class="tag q"><b>kW</b>哪台機台最耗電？</div>
+  <div id="q2" class="tag q"><b>PV</b>太陽能用了多少？</div>
+  <div id="q3" class="tag q"><b>CO₂</b>碳排從哪裡來？</div>
+  <div id="blind" class="kin coralc">看不見，</div>
+
+  <!-- S2 -->
+  <div id="k1" class="kin"><span class="w">把整座工廠，</span><span class="w mint">搬進瀏覽器。</span></div>
+  <div id="title"><div class="eb">ICMA LAB PRESENTS</div><div class="t">CNC 工廠<span class="mint">數位孿生</span></div><div class="s">DIGITAL TWIN FOR CNC MANUFACTURING</div></div>
+
+  <!-- S3 -->
+  <div id="chipsS3" class="abs"><div class="tag"><i></i>設備狀態</div><div class="tag amber"><i></i>加工進度</div><div class="tag blue"><i></i>累積產量</div></div>
+  <div id="tagSync" class="tag" style="left:72px;top:800px"><i></i><small>3D</small>廠區即時同步</div>
+  <div id="co1" class="callout"><div class="lb"><small>SPINDLE</small>主軸轉速</div></div>
+  <div id="co2" class="callout"><div class="lb"><small>POWER</small>即時功率</div></div>
+  <div id="co3" class="callout"><div class="lb"><small>ENERGY</small>累積用電</div></div>
+
+  <!-- S4 -->
+  <div id="tagPower" class="tag blue" style="left:72px;top:170px"><i></i><small>LAYER</small>電力圖層</div>
+  <div id="legend" class="abs"><div class="tag amber"><i></i>太陽能自用</div><div class="tag blue"><i></i>電網供電</div><div class="tag"><i></i>多餘外送</div></div>
+  <div id="formula" class="abs glass"><div class="eb">SOLAR BALANCE</div><div class="eq"><span style="color:var(--amber);margin:0;font-weight:800">太陽能發電</span><span>＝</span>廠內自用<span>＋</span>回送電網</div></div>
+
+  <!-- S5 -->
+  <div id="tagCloud" class="tag amber" style="left:72px;top:170px"><i></i><small>SCENARIO</small>雲層遮蔽</div>
+  <div id="tagFault" class="tag coral" style="left:72px;top:170px"><i></i><small>SCENARIO</small>機台故障 · CNC-02</div>
+  <div id="dimAll"></div>
+  <div id="k2" class="kin"><span class="w">先模擬，</span><span class="w mint">再決策。</span></div>
+
+  <!-- S6 -->
+  <div id="tagCarbon" class="tag coral" style="left:72px;top:170px"><i></i><small>LAYER</small>碳排圖層</div>
+  <div id="eqC" class="abs glass"><div class="eb">CARBON ESTIMATE</div><div class="eq">購電 kWh<span>×</span>排放係數<span>＝</span><span style="margin:0;color:var(--mint);font-weight:800">kgCO₂e</span></div><div class="foot">＊示範係數 0.474 kgCO₂e/kWh，僅供情境展示，非正式盤查</div></div>
+  <div id="trio" class="abs">
+    <div id="tc1" class="tc glass"><div class="ix">01 · OUTPUT</div><div class="ti">產能</div><div class="su">產量・稼動・週期</div><div class="bar2"><i></i></div><div class="sheen"></div></div>
+    <div id="tc2" class="tc glass"><div class="ix">02 · ENERGY</div><div class="ti">電費</div><div class="su">購電・自發自用</div><div class="bar2"><i></i></div><div class="sheen"></div></div>
+    <div id="tc3" class="tc glass"><div class="ix">03 · CARBON</div><div class="ti">減碳</div><div class="su">用電碳排・目標追蹤</div><div class="bar2"><i></i></div><div class="sheen"></div></div>
+  </div>
+  <div id="oneScreen" class="abs">放在<span class="mint">同一個畫面</span>管理</div>
+
+  <!-- S7 -->
+  <div id="tagAdd" class="tag" style="left:72px;top:170px"><i></i><small>SCALE</small>新增機台 · 自動排位</div>
+  <div id="iot">
+    <div class="eb">NEXT · 串接真實產線</div>
+    <svg width="1920" height="1080" viewBox="0 0 1920 1080">
+      <g fill="none" stroke="rgba(135,221,187,.35)" stroke-width="2">
+        <path id="p1" d="M570 310 C 690 310, 690 500, 790 500"/>
+        <path id="p2" d="M570 450 C 690 450, 690 500, 790 500"/>
+        <path id="p3" d="M570 590 C 690 590, 690 500, 790 500"/>
+        <path id="p4" d="M570 730 C 690 730, 690 500, 790 500"/>
+        <path id="p5" d="M1130 500 L 1340 500"/>
+      </g>
+      <g id="dots" fill="#87ddbb"></g>
+    </svg>
+    <div id="src1" class="src glass"><div class="ic">CNC</div><div class="tx">CNC 控制器<small>狀態・轉速・進度</small></div></div>
+    <div id="src2" class="src glass"><div class="ic" style="color:var(--blue)">kWh</div><div class="tx">智慧電錶<small>功率・累積用電</small></div></div>
+    <div id="src3" class="src glass"><div class="ic" style="color:var(--amber)">PV</div><div class="tx">太陽能逆變器<small>發電・外送</small></div></div>
+    <div id="src4" class="src glass"><div class="ic">IoT</div><div class="tx">環境感測<small>溫度・時間戳</small></div></div>
+    <div id="gw" class="abs glass"><div class="tx">IoT Gateway</div><small>WebSocket 資料轉接</small></div>
+    <div id="twin" class="abs glass"><div class="thumb"><img data-clip="hero" data-n="255" src="assets/clips/hero/0000.jpg"></div><div class="live">LIVE</div><div class="tx">數位孿生</div><small>與真實產線同步運轉</small></div>
+  </div>
+
+  <!-- S8 -->
+  <div id="k3" class="kin"><span class="w">看得見，</span><span class="w mint">才管得好。</span></div>
+  <div id="logo">
+    <div class="mark"><div class="glyph"><svg width="64" height="64" viewBox="0 0 64 64" fill="none" stroke="#0e1d18" stroke-width="5" stroke-linecap="round" stroke-linejoin="round"><circle cx="32" cy="14" r="6"/><circle cx="14" cy="46" r="6"/><circle cx="50" cy="46" r="6"/><path d="M29 19 L17 41 M35 19 L47 41 M20 46 L44 46"/></svg></div><div class="name">ICMA Lab</div></div>
+    <div class="cn">智慧商務多代理人實驗室</div>
+    <div class="line"></div>
+    <div class="tl">為你的工廠，打造<span class="mint">數位孿生</span>。</div>
+    <div class="ft">展示畫面為模擬資料 · 可依現場設備與 IoT 資料客製</div>
+  </div>
+  <div id="flash"></div>
+</div>
+<script src="_runtime/gsap.min.js"></script>
+<script src="_tl.js"></script>
+<script src="_runtime/core.js"></script>
+<script>
+const CLIPS = [];   // {img, t0, t1, skip, n}
+window.EPISODE = {
+  strings: { zh: {} },
+  build(c) {
+    const { m, S, L, LE, LM } = c;
+    const E = "expo.out", IO = "expo.inOut";
+    const fadeIn = (sel, t, d = .7) => m.fromTo(sel, { opacity: 0 }, { opacity: 1, duration: d, ease: "power2.out" }, t);
+    const fadeOut = (sel, t, d = .5) => m.to(sel, { opacity: 0, duration: d, ease: "power2.in" }, t);
+    const pop = (sel, t) => m.fromTo(sel, { opacity: 0, y: 24, scale: .94 }, { opacity: 1, y: 0, scale: 1, duration: .7, ease: "back.out(1.6)" }, t);
+    const words = (sel, t, gap = .28) => m.fromTo(sel + " .w", { opacity: 0, y: 70, filter: "blur(16px)" }, { opacity: 1, y: 0, filter: "blur(0px)", duration: 1, ease: E, stagger: gap }, t);
+    const clip = (sel, t0, t1, skip = 0) => { const el = c.$(sel); const img = el.tagName === "IMG" ? el : el.querySelector("img"); CLIPS.push({ img, t0, t1, skip, n: +img.dataset.n }); if (el.classList.contains("clip")) m.set(el, { opacity: 0 }, t1 + .6); };
+    const cutIn = (sel, t, d = .8) => m.fromTo(sel, { opacity: 0, clipPath: "inset(0 0 0 100%)" }, { opacity: 1, clipPath: "inset(0 0 0 0%)", duration: d, ease: IO }, t);
+
+    /* ── S1 hook ── */
+    fadeIn("#grid", .2, 1.5);
+    c.rise("#bill", L(0, 0) + .1, 1.1);
+    c.count("#billNum", 0, 1284600, L(0, 0) + .4, 2.2, v => Math.round(v).toLocaleString("en-US"));
+    pop("#q1", LM(0, 1, .02)); pop("#q2", LM(0, 1, .36)); pop("#q3", LM(0, 1, .68));
+    m.to(["#bill", "#q1", "#q2", "#q3"], { opacity: .18, filter: "blur(6px)", scale: .97, duration: .9, ease: "power2.inOut" }, L(0, 2) - .1);
+    c.rise("#blind", L(0, 2) + .25, 1);
+    c.out(["#bill", "#q1", "#q2", "#q3", "#blind", "#grid"], S(1).start - .45, .5);
+
+    /* ── S2 reveal ── */
+    const s1 = S(1).start;
+    clip("#c_hero", s1 - .2, S(2).start + 1);
+    m.fromTo("#c_hero", { opacity: 1, clipPath: "circle(0% at 66% 50%)" }, { clipPath: "circle(120% at 66% 50%)", duration: 1.6, ease: IO }, s1 + .1);
+    m.set("#c_hero", { opacity: 0 }, 0);
+    m.fromTo("#c_hero img", { scale: 1.32 }, { scale: 1.12, duration: S(2).start - s1 + 1, ease: "power1.out" }, s1);
+    m.fromTo("#c_hero img", { x: 330 }, { x: 0, duration: 1.4, ease: IO }, L(1, 1) - .4);
+    words("#k1", L(1, 0) + .2, .45);
+    fadeIn(["#topfade", "#botfade", "#demoTag"], s1 + .6, .6);
+    c.out("#k1", L(1, 1) - .3, .5);
+    m.to("#heroShade", { opacity: 0, duration: .6 }, L(1, 1) - .3);
+    fadeIn("#titleShade", L(1, 1) - .2, .8);
+    c.rise("#title .eb", L(1, 1) + .05, 1); c.rise("#title .t", L(1, 1) + .3, 1.2); c.rise("#title .s", L(1, 1) + .7, 1);
+    fadeIn("#flash", L(1, 1) + .25, .2); fadeOut("#flash", L(1, 1) + .45, 1);
+    c.out("#title", S(2).start - .4, .5);
+
+    /* ── S3 production ── */
+    const s2 = S(2).start;
+    fadeOut("#c_hero", s2, .6);
+    clip("#win img", s2 - .2, L(2, 1) + .5, 30);
+    c.tilt("#win", s2 + .05, 1.6);
+    m.to("#win", { rotateX: 0, rotateY: 0, scale: 1.02, duration: Math.max(.5, L(2, 1) - s2 - 1.6), ease: "power1.inOut" }, s2 + 1.6);
+    m.fromTo("#chipsS3 .tag", { opacity: 0, y: 20 }, { opacity: 1, y: 0, duration: .6, ease: "back.out(1.6)", stagger: .32 }, LM(2, 0, .2));
+    c.out(["#chipsS3"], L(2, 1) - .3, .4);
+    clip("#c_interior", L(2, 1) - .4, L(2, 2) + .3);
+    cutIn("#c_interior", L(2, 1) - .35, .9);
+    m.fromTo("#c_interior img", { scale: 1.0 }, { scale: 1.1, duration: L(2, 2) - L(2, 1) + .6, ease: "none" }, L(2, 1) - .35);
+    fadeOut("#win", L(2, 1) + .4, .1);
+    pop("#tagSync", L(2, 1) + .3); c.out("#tagSync", L(2, 2) - .35, .4);
+    const t3 = L(2, 2) - .3;
+    clip("#c_select", t3 - .4, S(3).start + .3);
+    cutIn("#c_select", t3 - .35, .8);
+    m.set("#c_select img", { transformOrigin: "1870px 470px" }, t3 - .4);
+    m.fromTo("#c_select img", { scale: 1 }, { scale: 1.85, duration: 1.6, ease: IO }, t3 + .7);
+    fadeIn("#coShade", LM(2, 2, .3), .6);
+    ["#co1", "#co2", "#co3"].forEach((s, k) => m.fromTo(s, { opacity: 0, x: -40 }, { opacity: 1, x: 0, duration: .6, ease: E }, LM(2, 2, .35 + k * .18)));
+    c.out(["#co1", "#co2", "#co3"], S(3).start - .35, .4);
+    fadeOut("#coShade", S(3).start - .35, .4);
+
+    /* ── S4 energy ── */
+    const s3 = S(3).start;
+    clip("#c_power", s3 - .3, L(3, 1) + .3);
+    cutIn("#c_power", s3 - .3, .9);
+    m.fromTo("#c_power img", { scale: 1.08 }, { scale: 1.22, duration: L(3, 1) - s3 + .6, ease: "none" }, s3 - .3);
+    pop("#tagPower", s3 + .3);
+    m.fromTo("#legend .tag", { opacity: 0, y: 20 }, { opacity: 1, y: 0, duration: .6, ease: "back.out(1.6)", stagger: .3 }, LM(3, 0, .35));
+    c.out(["#tagPower", "#legend"], L(3, 1) - .35, .4);
+    clip("#c_solar", L(3, 1) - .4, S(4).start + .3);
+    cutIn("#c_solar", L(3, 1) - .35, .9);
+    m.fromTo("#c_solar img", { scale: 1.05 }, { scale: 1.15, duration: S(4).start - L(3, 1) + .6, ease: "none" }, L(3, 1) - .35);
+    c.rise("#formula", LM(3, 1, .25), 1); c.sheen("#formula", LM(3, 1, .55));
+    c.out("#formula", S(4).start - .35, .4);
+
+    /* ── S5 scenarios ── */
+    const s4 = S(4).start;
+    clip("#c_cloud", Math.min(LM(4, 0, .22) - 1.0, s4 - .3), L(4, 1) + .3);
+    cutIn("#c_cloud", s4 - .3, .8);
+    m.set("#c_cloud img", { transformOrigin: "1100px 150px" }, s4 - .3);
+    m.fromTo("#c_cloud img", { scale: 1.0 }, { scale: 1.55, duration: 1.4, ease: IO }, s4 + .2);
+    pop("#tagCloud", s4 + .1); c.out("#tagCloud", L(4, 1) - .35, .4);
+    clip("#c_fault", Math.min(LM(4, 1, .2) - 1.0, L(4, 1) - .4), L(4, 2) + .8);
+    cutIn("#c_fault", L(4, 1) - .35, .8);
+    m.set("#c_fault img", { transformOrigin: "1350px 560px" }, L(4, 1) - .4);
+    m.fromTo("#c_fault img", { scale: 1.0 }, { scale: 1.38, duration: 1.6, ease: IO }, L(4, 1) + .2);
+    pop("#tagFault", L(4, 1) + .1); c.out("#tagFault", L(4, 2) - .2, .4);
+    fadeIn("#dimAll", L(4, 2) - .1, .7);
+    words("#k2", L(4, 2) + .2, .5);
+    c.out("#k2", S(5).start - .45, .5);
+    fadeOut("#dimAll", S(5).start - .1, .6);
+
+    /* ── S6 carbon ── */
+    const s5 = S(5).start;
+    clip("#c_carbon", s5 - .4, L(5, 1) + .4);
+    cutIn("#c_carbon", s5 - .4, .9);
+    m.fromTo("#c_carbon img", { scale: 1.06 }, { scale: 1.2, duration: L(5, 1) - s5 + .8, ease: "none" }, s5 - .4);
+    pop("#tagCarbon", s5 + .2);
+    c.rise("#eqC", LM(5, 0, .3), 1); c.sheen("#eqC", LM(5, 0, .7));
+    c.out(["#tagCarbon", "#eqC"], L(5, 1) - .35, .4);
+    clip("#c_ui2", L(5, 1) - .5, S(6).start + .3, 120);
+    m.fromTo("#c_ui2", { opacity: 0 }, { opacity: 1, duration: .8 }, L(5, 1) - .4);
+    m.fromTo("#c_ui2 img", { scale: 1.12, filter: "blur(0px) brightness(1)" }, { scale: 1.2, filter: "blur(8px) brightness(.45)", duration: 1.2, ease: "power2.out" }, L(5, 1) - .4);
+    c.rise(".tc", L(5, 1), 1, 60);
+    [1, 2, 3].forEach(k => m.fromTo(`#tc${k} .bar2 i`, { width: "0%" }, { width: [78, 62, 54][k - 1] + "%", duration: 1.4, ease: E }, L(5, 1) + .4 + k * .15));
+    [1, 2, 3].forEach(k => c.sheen(`#tc${k}`, LM(5, 1, .45 + k * .1)));
+    c.rise("#oneScreen", LM(5, 1, .55), .9);
+    c.out(["#trio", "#oneScreen"], S(6).start - .4, .45);
+    fadeOut("#c_ui2", S(6).start - .1, .4);
+
+    /* ── S7 scale + IoT ── */
+    const s6 = S(6).start;
+    clip("#c_add", Math.min(LM(6, 0, .6) - 2.67, s6 - .3), L(6, 1) + .3);
+    cutIn("#c_add", s6 - .3, .8);
+    m.set("#c_add img", { transformOrigin: "1500px 520px" }, s6 - .3);
+    m.fromTo("#c_add img", { scale: 1.0 }, { scale: 1.3, duration: 2, ease: IO }, s6 + .1);
+    pop("#tagAdd", s6 + .2); c.out("#tagAdd", L(6, 1) - .35, .4);
+    fadeOut("#c_add", L(6, 1) - .2, .6);
+    fadeOut(["#topfade", "#botfade"], L(6, 1) - .2, .6);
+    fadeIn("#iot", L(6, 1) - .2, .6);
+    m.fromTo(".src", { opacity: 0, x: -40 }, { opacity: 1, x: 0, duration: .7, ease: E, stagger: .14 }, L(6, 1) + .1);
+    c.state.flow = 0; m.to(c.state, { flow: 1, duration: .8 }, LM(6, 1, .5));
+    c.rise("#gw", LM(6, 1, .45), .9);
+    clip("#twin img", L(6, 2) - .5, S(7).start + .3, 60);
+    c.rise("#twin", L(6, 2) - .2, 1);
+    m.fromTo("#twin .live", { opacity: 0, scale: .6 }, { opacity: 1, scale: 1, duration: .5, ease: "back.out(2)" }, LM(6, 2, .55));
+    m.to("#twin", { boxShadow: "0 0 0 2px rgba(135,221,187,.6), 0 0 80px rgba(135,221,187,.35)", duration: .8 }, LM(6, 2, .55));
+    c.out("#iot", S(7).start - .4, .5);
+    fadeOut("#demoTag", S(7).start - .4, .4);
+
+    /* ── S8 close ── */
+    const s7 = S(7).start;
+    fadeIn("#grid", s7 - .2, 1);
+    words("#k3", L(7, 0) - .05, .5);
+    c.out("#k3", L(7, 1) - .3, .45);
+    m.fromTo("#logo .mark", { opacity: 0, scale: .9, filter: "blur(18px)" }, { opacity: 1, scale: 1, filter: "blur(0px)", duration: 1.2, ease: E }, L(7, 1) - .05);
+    fadeIn("#flash", L(7, 1) + .1, .2); fadeOut("#flash", L(7, 1) + .3, 1.2);
+    c.rise("#logo .cn", L(7, 1) + .35, 1);
+    m.to("#logo .line", { width: 520, duration: 1.2, ease: E }, L(7, 1) + .6);
+    c.rise("#logo .tl", L(7, 1) + .8, 1);
+    c.rise("#logo .ft", LE(7, 1) + .2, 1);
+  },
+  tick(t, c) {
+    for (const k of CLIPS) {
+      if (t < k.t0 - .05 || t > k.t1 + .05) continue;
+      const f = Math.max(0, Math.min(k.n - 1, Math.floor((t - k.t0) * 30) + k.skip));
+      const src = `assets/clips/${k.img.dataset.clip}/${String(f).padStart(4, "0")}.jpg`;
+      if (k.img.getAttribute("src") !== src) k.img.setAttribute("src", src);
+    }
+    const g = c.$("#dots"); const fl = c.state.flow || 0;
+    if (g && fl > 0) {
+      let h = "";
+      ["#p1", "#p2", "#p3", "#p4", "#p5"].forEach((id, i) => {
+        const p = c.$(id), len = p.getTotalLength();
+        for (let j = 0; j < 3; j++) {
+          const u = ((t * .45 + j / 3 + i * .17) % 1);
+          const pt = p.getPointAtLength(u * len);
+          h += `<circle cx="${pt.x.toFixed(1)}" cy="${pt.y.toFixed(1)}" r="${i === 4 ? 7 : 5.5}" opacity="${(fl * Math.sin(u * Math.PI)).toFixed(2)}"/>`;
+        }
+      });
+      g.innerHTML = h;
+    } else if (g) g.innerHTML = "";
+  }
+};
+</script>
+<script src="_runtime/runtime.js"></script>
+<script>
+(() => {
+  const base = window.__seek;
+  window.__seek = (t) => {
+    base(t);
+    const imgs = [...document.querySelectorAll("img[data-clip]")].filter(i => !i.complete || !i.naturalWidth);
+    if (!imgs.length) return true;
+    return Promise.all(imgs.map(i => i.decode().catch(() => null))).then(() => true);
+  };
+})();
+</script>
+</body></html>
