@@ -3,13 +3,8 @@
   "viewport": [1920, 1080],
   "fps": 30,
   "quality": 80,
-  "cine": { "container": ".scene-area", "canvas_host": "#scene", "background": "#18242a" },
+  "cine": { "container": "", "canvas_host": "", "background": "#101418" },
   "ui_css": "",
   "setup": [],
-  "shots": {
-    "hero":     { "mode": "cine", "frames": 255, "actions": [ {"drag": 220, "from": 0, "to": 254, "x0": 860, "y": 540} ] },
-    "feature":  { "mode": "ui",   "frames": 240, "actions": [ {"at": 20, "click": "按鈕或清單上的文字"} ] },
-    "layer":    { "mode": "cine", "frames": 255, "setup": [ {"click": "圖層按鈕文字"} ], "actions": [ {"drag": 160, "from": 0, "to": 254} ] },
-    "scenario": { "mode": "ui",   "frames": 240, "actions": [ {"at": 30, "click": "情境按鈕文字"} ] }
-  }
+  "shots": {}
 }

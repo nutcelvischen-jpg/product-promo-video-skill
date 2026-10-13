@@ -13,7 +13,9 @@
 
 ![preview](docs/preview.jpg)
 
-> 範例：CNC 工廠數位孿生介紹影片（90 秒、企業客戶、片尾 ICMA Lab）— 見 `examples/cnc-twin/`
+> 案例：CNC 工廠數位孿生介紹影片（90 秒、企業客戶、片尾 ICMA Lab）— `examples/cnc-twin/CASE-STUDY.md` 記錄每個決策的理由。
+>
+> **這個 skill 教的是方法，不是範本**：AI 會依你的產品與觀眾自己設計故事、鏡頭與畫面，不會套用 CNC 那支片的場景。
 
 這是一個 **Agent Skill**（`SKILL.md` 格式），可以在 Google Antigravity、Claude Code 等支援 skills 的 AI 工具中使用。它建立在 [motion-video-skill](https://github.com/nutcelvischen-jpg/motion-video-skill) 之上，**兩個都要裝**。
 
@@ -74,14 +76,14 @@ AI 會依序：試用 → 給你改程式的建議 → 給你看台詞 → 擷�
 ```bash
 P=.agents/skills/product-promo-video; MV=.agents/skills/motion-video
 python $P/scripts/new_promo.py videos/demo --mv $MV                       # 建資料夾
-# 改 videos/demo/script.json（台詞）、shots.json（鏡頭）
+# 依 references/01～03：試用產品 → 設計故事寫 script.json → 設計鏡頭寫 shots.json
 python $P/scripts/capture.py videos/demo/shots.json --out videos/demo/assets/clips --test   # 試拍
 python $P/scripts/capture.py videos/demo/shots.json --out videos/demo/assets/clips          # 正式拍
 set -a; source ~/.openrouter.env; set +a
 python $MV/scripts/tts.py videos/demo --lang zh                             # 配音
 python $P/scripts/align_timeline.py videos/demo --mv $MV --target 90       # 對齊＋壓長度
 python $MV/scripts/render.py videos/demo --preview                          # 更新時間軸
-# 改 videos/demo/index.html（動畫）
+# 依 references/04～05：在 index.html 骨架上設計每個場景
 python $MV/scripts/render.py videos/demo --sheet                            # 總覽圖檢查
 python $P/scripts/music.py videos/demo/music.json --timeline videos/demo/timeline_zh.json --out videos/demo/bgm.wav
 python $P/scripts/sfx.py videos/demo/sfx.json --timeline videos/demo/timeline_zh.json --out videos/demo/sfx.wav
@@ -89,7 +91,7 @@ python $MV/scripts/render.py videos/demo --lang zh --crf 18                 # �
 python $P/scripts/mix.py videos/demo --lang zh                              # 混音＋成片
 ```
 
-完整說明見 [SKILL.md](SKILL.md)，各主題細節在 `references/`。
+完整說明見 [SKILL.md](SKILL.md)；方法論在 `references/01～07`。
 
 ---
 

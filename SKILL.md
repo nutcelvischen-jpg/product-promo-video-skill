@@ -1,222 +1,147 @@
 ---
 name: product-promo-video
-description: 把一個可以在瀏覽器打開的產品（網站、儀表板、3D 數位孿生、SaaS 系統）實際操作錄下來，剪成「行銷公司等級」的橫式產品介紹影片：行銷腳本、真實操作畫面、推鏡與標註、台灣口音配音、配樂與音效，一次輸出 MP4。當使用者說「幫我的系統／網站／專題做介紹影片」「做產品宣傳片」「給企業客戶看的 demo 影片」「錄操作畫面做成影片」時使用。需要搭配 motion-video-skill。
+description: 引導 AI 用程式為「能在瀏覽器打開的產品」（網站、儀表板、3D 數位孿生、SaaS）製作專業產品介紹影片：自己試用產品、依觀眾設計故事、從台詞設計鏡頭、逐格擷取真實操作畫面、用 HTML/GSAP 做動態設計、配音配樂混音，輸出 MP4。當使用者要「幫我的系統／網站／專題做介紹影片」「產品宣傳片」「給客戶看的 demo 影片」時使用。需搭配 motion-video-skill（渲染引擎）。
 ---
 
-# Product Promo Video Skill — 把網頁產品做成專業介紹影片
+# Product Promo Video — 用程式做產品介紹影片
 
-這個 skill 是 [motion-video-skill](https://github.com/nutcelvischen-jpg/motion-video-skill) 的延伸：
-motion-video 負責「動畫＋配音＋渲染」的引擎，這個 skill 加上**產品實拍**與**行銷包裝**：
+## 這個 skill 在教什麼
 
-| 加了什麼 | 用什麼做 |
-|---|---|
-| 真實操作畫面（含 3D / WebGL）逐格擷取，30fps 平順 | `scripts/capture.py` + `scripts/vt.js`（虛擬時鐘） |
-| 行銷公司的腳本結構（痛點→登場→功能→情境→價值→署名） | `references/storyboard-marketing.md` |
-| 畫面放大推鏡、標註、轉場、Logo 片尾 | `templates/promo-wide/index.html` |
-| 配音加速＋句子精準對齊停頓 | `scripts/align_timeline.py` |
-| 配樂（Apple Loops 編排）、轉場音效（程式合成）、專業混音 | `scripts/music.py`、`sfx.py`、`mix.py` |
-| 檢查用總覽圖 | `scripts/contact_sheet.py` |
+不是一套固定範本，而是一套**做片的方法**：怎麼看懂一個產品、怎麼替特定觀眾找到故事、怎麼把每句話變成可以拍的畫面、怎麼用程式把畫面、文字、聲音精準對在一起。
 
-完整範例：`examples/cnc-twin/`（CNC 工廠數位孿生，90 秒，企業客戶，片尾 ICMA Lab）。
+`examples/cnc-twin/` 是一個完整案例，**用來理解決策，不是用來套用**。每個產品的觀眾、賣點、介面、顏色都不同；如果你做出來的影片換個產品名稱就能套到 CNC 那支，代表你在抄，不是在設計。
 
-`<P>` = 本 skill 資料夾，`<MV>` = motion-video skill 資料夾。所有指令在**工作區根目錄**執行，影片放 `videos/<名稱>/`。
+## 核心原則
+
+1. **先當使用者，再當導演。** 沒親手操作過產品之前，不寫任何台詞。影片能賣的只有產品真正做得到、而且鏡頭拍得出來的東西。
+2. **觀眾決定一切。** 同一個產品，給老闆看講風險與成本，給評審看講創新與技術，給學生看講好玩與好學。結構、語氣、長度、要秀的功能都從這裡推導。
+3. **旁白是時鐘。** 所有畫面、轉場、音樂起落都綁在台詞時間上（`L(i,j)`），不寫死秒數。改台詞，整支片自動重新對齊。
+4. **每句話都要被畫面「演出來」。** 講「點一下」就要看到點；講「下降」就要看到數字掉。講了畫面卻沒有對應，觀眾就不會相信。
+5. **真實素材 > 示意動畫。** 產品實際操作畫面最有說服力；動態設計是用來「引導視線」和「解釋看不見的東西」，不是取代產品。
+6. **一次一個重點。** 畫面同時最多 3 個焦點；觀眾看不懂的地方，用推鏡、壓暗、標註把視線帶過去。
+7. **誠實。** 模擬資料要標示、示範參數要註明、未完成功能只能說「下一步」、不捏造客戶與成效。給企業看的影片，一句誇大就毀掉整支片的可信度。
+8. **每一步都要親眼檢查。** 截圖、總覽圖、成片抽格都要打開來看，不要假設程式「應該」做對了。
+
+## 工具與分工
+
+| 層 | 工具 | 你要自己決定的事 |
+|---|---|---|
+| 渲染引擎（配音、字幕、時間軸、逐格輸出） | motion-video-skill：`tts.py`、`render.py`、`wide` runtime | 聲音、語氣、版型 |
+| 真實畫面擷取 | `scripts/capture.py` + `vt.js`（虛擬時鐘，3D 也能平順 30fps） | 拍哪些鏡頭、動作在第幾格、怎麼運鏡 |
+| 動畫骨架 | `templates/promo-wide/index.html`（只有素材層與時間工具，**沒有任何場景**） | 所有場景、版面、文字、轉場 |
+| 配音對齊 | `scripts/align_timeline.py` | 目標長度、是否要刪台詞 |
+| 聲音設計 | `scripts/music.py`、`sfx.py`、`mix.py`、`apple_loops.py` | 曲風、段落起落、哪裡要重擊 |
+| 檢查 | `scripts/contact_sheet.py`、`render.py --sheet` | 你的眼睛 |
+
+`<P>` = 本 skill 資料夾，`<MV>` = motion-video skill 資料夾。影片放 `videos/<名稱>/`。
 
 ---
 
-## 總流程（照順序做，每一步都有檢查點）
+## 工作流程
 
-```
-0 環境 → 1 試用產品 → 2 腳本（給使用者確認）→ 3 建資料夾 → 4 鏡頭清單 + 試拍 → 5 正式擷取
-→ 6 配音 + 對齊 → 7 動畫 → 8 總覽圖檢查 → 9 配樂音效 → 10 渲染 + 混音 → 11 成片檢查 → 12 交付
-```
+每一步都有「要想清楚的事」「產出」「檢查點」。前一步的產出是下一步的輸入。
 
-時間預估（90 秒影片）：腳本 15 分、擷取 20～60 分（看電腦，可背景跑）、動畫 30～60 分、渲染 10～15 分。
+### 1. 理解產品 → 讀 `references/01-product-discovery.md`
 
----
+**要想清楚：** 這個產品解決誰的什麼問題？它最厲害的那一刻是什麼（the money shot）？哪些功能在影片裡會看不清楚？
 
-## 步驟 0：環境
+做法：讀專案文件 → 把產品跑起來 → 用 Playwright 逐一操作每個功能並截圖 → 拼總覽圖親眼看。
 
-```bash
-git clone https://github.com/nutcelvischen-jpg/motion-video-skill .agents/skills/motion-video   # 若還沒裝
-pip install playwright numpy pillow imageio-ffmpeg && python -m playwright install chromium
-python <MV>/scripts/check_env.py
-ffmpeg -version     # mix.py / align_timeline.py 需要系統 ffmpeg
-```
-- TTS 金鑰用環境變數 `OPENROUTER_API_KEY`（或 `GEMINI_API_KEY`），**絕不寫進檔案或對話**。
-  使用者沒設定時，請他存在家目錄的隱藏檔（例：`~/.openrouter.env`，`chmod 600`），執行時 `set -a; source ~/.openrouter.env; set +a`。
-- Mac 的 Homebrew Python 若出現 `CERTIFICATE_VERIFY_FAILED`：`export SSL_CERT_FILE=/etc/ssl/cert.pem`。
-- 雲端／沙盒環境常常連不到 TTS API 或 Google Fonts：TTS 改在使用者電腦上跑，字型改用本機字型（範本已內建 Manrope + Noto Sans CJK TC 備援）。
+**產出：** 功能清單（每項標註「可直接拍／需推鏡放大／看不清楚建議改程式」）、候選的 money shot、產品的色票與字型。
+**檢查點：** 把「建議先改的程式」分成「建議改／可改可不改／不用改」回報使用者。使用者改完再拍，不然要重拍。
 
-## 步驟 1：先當使用者，把產品玩一遍（不可省略）
+### 2. 設計故事 → 讀 `references/02-story-design.md`
 
-目的：知道有哪些「值得拍」的畫面、哪些功能在影片裡會看不清楚。
+**要想清楚：** 觀眾是誰？看完要做什麼？一句話價值主張是什麼？哪一種敘事結構最適合（問題—解法、成果先行、前後對比、一天的工作、功能巡禮、架構解說……）？
 
-1. 讀產品的 `README.md` / `PRODUCT.md` / `DESIGN.md`：功能、色票、字型、資料是真是假。
-2. 啟動產品：靜態網站 `cd dist && python -m http.server 8766`；Vite 專案 `npm run build` 後同上（或 `npm run dev`）。
-3. 用 Playwright 開起來，**列出所有按鈕文字**（之後鏡頭清單要用）：
-   ```python
-   btns = await pg.eval_on_selector_all("button", "els=>els.map(e=>(e.innerText||e.getAttribute('aria-label')||'').trim())")
-   ```
-4. 每個主要功能點一次、截一張圖，拼成總覽圖親自看。特別注意：
-   - **在小畫面看不出差異的功能**（例如圖層只變一點點顏色）→ 影片要推鏡放大，或建議使用者先改程式加強對比。
-   - **鏡頭預設差異太小** → 改用滑鼠拖曳做環繞運鏡（capture.py 的 `drag`）。
-   - **3D 畫布的父容器選擇器**（例如 `.scene-area` / `#scene`）→ 之後做全螢幕「電影鏡頭」用。
-   - 有沒有 toast、彈窗、需要登入、localStorage 會記住上次狀態。
-5. 回報使用者：哪些能直接拍、哪些建議先改程式（列成「建議改／可改可不改／不用改」三類，附理由與改法）。**使用者改完再拍**，不然要重拍。
+不要直接套固定的幾場結構。先寫出「訊息階層」（觀眾最該記住的 1 件事、支撐它的 2～4 件事），再選結構、排節奏（beat sheet），最後才寫台詞。
 
-## 步驟 2：寫行銷腳本（先給使用者確認台詞再往下）
+**產出：** `script.json`，每句台詞旁邊寫好「這句由哪個鏡頭／什麼畫面演出」。
+**檢查點：** 台詞給使用者確認後才往下。
 
-先讀 `references/storyboard-marketing.md`。問清楚（沒說就用預設）：
+### 3. 設計鏡頭 → 讀 `references/03-shot-design.md`
 
-| 項目 | 預設 |
-|---|---|
-| 長度 | 90 秒（約 330～360 個中文字）|
-| 觀眾 | 企業客戶（決策者）|
-| 語言 | 台灣華語（`zh`）|
-| 聲音 | `Leda`＋「科技發表會旁白：沉穩、專業、有自信」|
-| 片尾署名 | 使用者的實驗室／公司 |
+**要想清楚：** 每個 beat 用什麼畫面最有說服力？是 3D 全螢幕的電影感（cine），還是整個介面看數字變化（ui）？關鍵動作要發生在第幾格，才能對上台詞？
 
-標準 8 場結構：**痛點鉤子 → 產品登場 → 核心功能 → 原理／圖層 → 情境模擬 → 量化價值 → 擴充與未來 → 記憶點＋署名**。
+**產出：** `shots.json`（鏡頭清單與動作）。先 `--test` 試拍、看總覽圖，再正式擷取（可背景執行，同時做步驟 4、5）。
+**檢查點：** 每個鏡頭的關鍵動作都真的發生了、運鏡的起點與終點都好看。
 
-規則：
-- 每句 8～24 字；數字與英文縮寫用 `["念法", "顯示"]`（例：`["C N C", "CNC"]`、`["3 D", "3D"]`、`["I o T", "IoT"]`）。
-- 中文一律台灣用語（影片、資料、軟體、品質；不用視頻、數據、軟件、質量、家人們）。
-- **誠實**：模擬資料要標「展示畫面・模擬資料」；示範係數要註明；未來功能用「下一步」，不能講成已上線；不捏造客戶、成效數字。開場若用戲劇化數字（帳單金額），交付時要提醒使用者。
-- 每句台詞旁邊寫好「這句配什麼畫面」，畫面要能從產品實際拍到。
+### 4. 配音與時間 → 讀 `references/05-timing-and-sync.md`
 
-## 步驟 3：建資料夾
+用 motion-video 的 `tts.py` 配音（先試一段請使用者聽口音），再用 `align_timeline.py --target <秒數>` 壓長度並把句子對齊真正的停頓。之後所有時間都以這份時間軸為準。
+
+### 5. 建立視覺語言並做動畫 → 讀 `references/04-visual-language.md`、`05-timing-and-sync.md`
+
+**要想清楚：** 這支片的視覺應該長什麼樣子？——答案在產品裡：沿用產品的色票、字型、語意色（例如綠＝正常、紅＝警示），讓觀眾在影片與產品之間看到一致的意義。每個場景要解決什麼「看不懂」的問題？用什麼技巧引導視線？
+
+從 `new_promo.py` 建的骨架開始，**自己設計每個場景**。技巧（推鏡、標註、壓暗、大字、架構圖、數字跳動……）是工具箱，依目的挑選，必要時自己發明新的。
+
+**檢查點：** `render.py --sheet` 每句一張，逐張親眼看（`references/07-review.md`）。
+
+### 6. 聲音設計 → 讀 `references/06-sound-design.md`
+
+**要想清楚：** 音樂的情緒曲線要跟故事一樣——痛點壓抑、產品登場打開、金句時讓出空間、結尾收束。音效只放在真正的轉折點。
+
+### 7. 渲染、混音、成片檢查、交付
 
 ```bash
-python <P>/scripts/new_promo.py videos/<名稱> --mv <MV>
-```
-然後：把確認過的台詞寫進 `script.json`；`index.html` 的 `:root` 換成產品色票（看產品 CSS 變數或 DESIGN.md）、`assets/fonts/` 換成產品字型。
-
-## 步驟 4：鏡頭清單 + 試拍
-
-先讀 `references/capture-guide.md`。編輯 `shots.json`，每個鏡頭一個條目：
-
-- `mode: "cine"`：只留 3D 畫布、全螢幕（產品登場、圖層、電影感環繞）。
-- `mode: "ui"`：整個介面（點按鈕、看數字跳動、表單操作），之後在動畫裡推鏡到重點區域。
-- 動作在第幾格發生（30 格 = 1 秒）：`click`（按鈕文字）、`drag`（環繞）、`type`（逐字輸入）、`fill`、`select`、`eval`。
-- 每個鏡頭 240～270 格（8～9 秒），比該句台詞長一點；**關鍵動作放在第 20～30 格**，方便動畫對時。
-
-試拍（每 45 格存一張，快速檢查動作有沒有發生）：
-```bash
-python <P>/scripts/capture.py videos/<名稱>/shots.json --out /tmp/test_clips --test
-python <P>/scripts/contact_sheet.py clips /tmp/test_clips      # 打開 sheet_clips.jpg 看
-```
-確認：按鈕真的按到（log 出現「找不到按鈕文字」就是沒按到）、環繞角度不會轉到產品背面、彈窗/toast 正常。
-
-## 步驟 5：正式擷取（可背景執行）
-
-```bash
-nohup python <P>/scripts/capture.py videos/<名稱>/shots.json --out videos/<名稱>/assets/clips --jobs 2 > capture.log 2>&1 &
-```
-- 沒有 GPU 的雲端：3D 全螢幕約 1～2.5 秒／格、UI 約 1 秒／格。10 個鏡頭約 30～60 分鐘。**趁擷取時做步驟 6、7。**
-- Mac 有 GPU：在 shots.json 加 `"channel": "chrome", "gpu": true`，快 5～10 倍。
-- 完成後一定跑 `contact_sheet.py clips` 看每個鏡頭的頭、中、尾。
-
-## 步驟 6：配音 + 對齊
-
-```bash
-python <MV>/scripts/tts.py videos/<名稱> --lang zh --only s01   # 先試一段聽口音
-python <MV>/scripts/tts.py videos/<名稱> --lang zh               # 全部
-python <P>/scripts/align_timeline.py videos/<名稱> --mv <MV> --target 90   # 壓到目標長度並對齊句子
-python <MV>/scripts/render.py videos/<名稱> --preview            # 更新 _tl.js
-```
-- TTS 通常比估計長 5～10%。`--target` 會自動算加速倍率（建議 0.95～1.08；超過 1.12 就該刪台詞）。
-- align 會把句子邊界吸附到真正的停頓，畫面切換才會精準。log 出現「找不到停頓」的句子，檢查台詞是否太長或標點太少。
-- 改了某一場台詞：`tts.py --only s03` 重做 → `align_timeline.py ... --refresh s03`（把新檔收進 raw 再重新對齊）。
-
-## 步驟 7：做動畫（改 index.html）
-
-先讀 `references/motion-recipes.md`，再看 `examples/cnc-twin/index.html`。核心概念：
-
-- 每個鏡頭是一個 `.clip`，`clip(sel, t0, t1, skip)` 宣告「t0 秒開始播第 skip 格」；`tick()` 每格換圖。
-- **所有時間綁台詞**：`S(i).start`、`L(i,j)`、`LM(i,j,k)`，不要寫死秒數。
-- 動作對時：鏡頭在第 30 格按下按鈕 → `clip(sel, LM(i,j,.22) - 1.0, ...)` 讓「按下」落在問句講完的瞬間。
-- 轉場：`cutIn`（擦入）；推鏡：`zoomTo(sel, x, y, scale, t)`（x,y 用截圖量面板位置）；慢推：`drift`。
-- 文字：痛點卡＋數字跳動、問題膠囊 `.tag`、大字 `.kin .w`（逐行模糊浮現）、標註 `.callout`、公式卡 `.card`、Logo。
-- 畫面上同時最多 3 個重點；字幕區（下方 160px）不放東西；長時間顯示產品畫面時保持「展示畫面・模擬資料」標籤。
-
-## 步驟 8：總覽圖檢查（每次改完都做，直到沒問題）
-
-```bash
-python <MV>/scripts/render.py videos/<名稱> --sheet          # 每句結尾一張
-python <MV>/scripts/render.py videos/<名稱> --stills 41.5,68  # 指定秒數
-```
-**一定要打開圖親自看**，對照 `references/qa-checklist.md`。最常見的錯：上一個鏡頭沒隱藏蓋住後面、卡片跑出畫面（`.glass` 的 position 衝突）、文字壓到 3D 主體、字幕被擋。
-
-## 步驟 9：配樂與音效
-
-先讀 `references/audio-guide.md`。
-```bash
-# Mac：從 GarageBand 內建 Apple Loops 選同一家族（同 BPM 同調）
-python <P>/scripts/apple_loops.py list --genre Chillwave
-python <P>/scripts/apple_loops.py beats --bars-of 9.6
-python <P>/scripts/apple_loops.py convert "07 Chillwave/Forward Progress Synth" "07 Chillwave/Forward Progress Bass" "07 Chillwave/Matchbox Beat 01" --out videos/<名稱>/loops
-# 編排（段落綁旁白）與音效
-python <P>/scripts/music.py videos/<名稱>/music.json --timeline videos/<名稱>/timeline_zh.json --out videos/<名稱>/bgm.wav
-python <P>/scripts/sfx.py   videos/<名稱>/sfx.json   --timeline videos/<名稱>/timeline_zh.json --out videos/<名稱>/sfx.wav
-```
-- 音樂的關鍵：`anchor` 讓強拍落在產品登場那一刻；開場用低通濾波「悶住」、登場瞬間打開；重點句（例「先模擬，再決策」）抽掉鼓兩小節；片尾只留旋律淡出。
-- 沒有 Mac：使用者提供自己有授權的 `bgm.wav`，music.json 只放一軌。
-
-## 步驟 10：渲染 + 混音
-
-```bash
-python <MV>/scripts/render.py videos/<名稱> --lang zh --crf 18 --workers 2
+python <MV>/scripts/render.py videos/<名稱> --lang zh --crf 18
 python <P>/scripts/mix.py videos/<名稱> --lang zh --max-mb 30
-```
-- `--crf 18`：產品畫面細節多，預設 26 會糊。90 秒約 30 MB。
-- mix.py：旁白壓縮、音樂側鏈閃避人聲、音效疊上、整體 loudnorm -15 LUFS，輸出 `out/<名稱>_zh_final.mp4`；超過 `--max-mb` 另存 `_small.mp4`。
-
-## 步驟 11：成片檢查
-
-```bash
 python <P>/scripts/contact_sheet.py video videos/<名稱>/out/<名稱>_zh_final.mp4 --every 4
 ```
-看：每張的字幕與畫面是否對應、轉場時沒有黑畫面、片尾 Logo 有出現、總長符合目標。
-聲音無法自動檢查：**請使用者親自聽**口音、念錯字、音樂音量。
-
-## 步驟 12：交付
-
-- 成片：`out/<名稱>_zh_final.mp4`（傳檔有大小限制就給 `_small.mp4`）。
-- 原始檔：`index.html`、`script.json`、`shots.json`、`music.json`、`sfx.json`、`timeline_zh.json`（`assets/clips/` 很大，可不附，能用 shots.json 重拍）。
-- 回報：長度、大小、響度、哪些是戲劇化／示範內容需要使用者確認、建議下一步（英文版、15 秒短版、直式版）。
+交付時說清楚：長度、大小、哪些是戲劇化／示範內容需要使用者確認、聲音需要使用者親自聽。
 
 ---
 
-## 常見問題
+## 指令速查
 
-見 `references/troubleshooting.md`。最常見的五個：
-1. **截圖卡住不動**：用了 Playwright 的 `page.clock` → 改用本 skill 的 `vt.js`（capture.py 已處理）。
-2. **成片某段畫面是上一格**：`index.html` 最後那段 `__seek` 覆寫（等圖片 decode）被刪了。
-3. **卡片位置跑掉**：`.glass` 帶 `position:relative`，卡片要加 `position:absolute!important`（範本的 `.card` 已處理）。
-4. **按鈕沒按到**：文字比對是「完全相同」優先、其次「開頭相同」；同名按鈕（清單項目 vs 鏡頭按鈕）會按錯 → 改用 `click_sel`。
-5. **動作跟台詞對不上**：clip 的 t0 沒有扣掉「動作發生在第幾格 ÷ 30」。
-
-## 檔案地圖
-
+```bash
+# 環境（第一次）
+pip install playwright numpy pillow imageio-ffmpeg && python -m playwright install chromium   # 另需系統 ffmpeg
+# 建立影片資料夾（骨架）
+python <P>/scripts/new_promo.py videos/<名稱> --mv <MV>
+# 擷取
+python <P>/scripts/capture.py videos/<名稱>/shots.json --out /tmp/test --test
+python <P>/scripts/contact_sheet.py clips /tmp/test
+python <P>/scripts/capture.py videos/<名稱>/shots.json --out videos/<名稱>/assets/clips --jobs 2
+# 配音與時間
+set -a; source ~/.openrouter.env; set +a        # 金鑰只放使用者電腦的隱藏檔，不進專案、不貼對話
+python <MV>/scripts/tts.py videos/<名稱> --lang zh [--only s01]
+python <P>/scripts/align_timeline.py videos/<名稱> --mv <MV> --target 90 [--refresh s03]
+python <MV>/scripts/render.py videos/<名稱> --preview
+# 檢查動畫
+python <MV>/scripts/render.py videos/<名稱> --sheet          # 或 --stills 12.5,40
+# 聲音
+python <P>/scripts/apple_loops.py list|beats|convert ...      # Mac
+python <P>/scripts/music.py videos/<名稱>/music.json --timeline videos/<名稱>/timeline_zh.json --out videos/<名稱>/bgm.wav
+python <P>/scripts/sfx.py   videos/<名稱>/sfx.json   --timeline videos/<名稱>/timeline_zh.json --out videos/<名稱>/sfx.wav
+# 輸出
+python <MV>/scripts/render.py videos/<名稱> --lang zh --crf 18
+python <P>/scripts/mix.py videos/<名稱> --lang zh --max-mb 30
 ```
-<P>/
-├── SKILL.md                         ← 本檔
-├── scripts/
-│   ├── new_promo.py                 ← 建影片資料夾（套 promo-wide 範本）
-│   ├── capture.py + vt.js           ← 逐格擷取產品畫面
-│   ├── align_timeline.py            ← 配音加速＋句子對齊
-│   ├── music.py / apple_loops.py    ← 配樂編排 / 找 Apple Loops
-│   ├── sfx.py                       ← 程式合成音效
-│   ├── mix.py                       ← 混音＋合成成片
-│   ├── contact_sheet.py             ← 鏡頭／成片總覽圖
-│   └── ppvslib.py                   ← 共用（時間運算式、wav）
-├── templates/promo-wide/            ← index.html、script.json、shots/music/sfx.json、字型
-├── examples/cnc-twin/               ← 完整案例（90 秒企業版）
-└── references/
-    ├── storyboard-marketing.md      ← 行銷腳本結構、台詞公式、誠實原則
-    ├── capture-guide.md             ← shots.json 完整說明、鏡頭設計
-    ├── motion-recipes.md            ← 動畫招式與對時公式
-    ├── audio-guide.md               ← 配音、選曲、編排、音效、混音
-    ├── qa-checklist.md              ← 檢查清單
-    └── troubleshooting.md           ← 錯誤排除
-```
+
+## 反模式（看到就停下來重想）
+
+- 把 `examples/cnc-twin` 的場景、台詞、顏色、版面搬過來改字。
+- 沒操作過產品就開始寫腳本。
+- 台詞講的功能，畫面沒有拍到（或產品根本做不到）。
+- 每個場景都用同一招（全部都是「擦入＋左上標籤」）——技巧要服務內容，不同的訊息用不同的表現。
+- 一個畫面塞 5 個標籤、兩段字、一個公式。
+- 時間寫死秒數；改一次台詞整支片就亂掉。
+- 文字壓在亮色畫面上沒有底、壓在產品主體上。
+- 沒看總覽圖就渲染成片。
+- 把模擬資料講成真實成效、把路線圖講成已上線。
+
+## 參考文件
+
+| 檔案 | 內容 |
+|---|---|
+| `references/01-product-discovery.md` | 怎麼試用產品、找 money shot、可視性檢查、給改程式建議 |
+| `references/02-story-design.md` | 觀眾 → 訊息階層 → 敘事結構 → 節奏 → 台詞；誠實原則 |
+| `references/03-shot-design.md` | 從台詞到鏡頭；cine / ui；動作與運鏡；`shots.json` 規格 |
+| `references/04-visual-language.md` | 從產品推導視覺；版面、字級、色彩；技巧工具箱與何時用 |
+| `references/05-timing-and-sync.md` | 時間模型、對時公式、節奏、骨架 API |
+| `references/06-sound-design.md` | 配音、配樂編排、音效、混音 |
+| `references/07-review.md` | 自我審查方法與檢查清單 |
+| `references/troubleshooting.md` | 常見錯誤與解法 |
+| `examples/cnc-twin/CASE-STUDY.md` | 案例：每個決策為什麼這樣做、換成別的產品會怎麼改 |
