@@ -13,7 +13,9 @@ Give the AI a product that runs in a browser (website, dashboard, 3D digital twi
 
 ![preview](docs/preview.jpg)
 
-> Example: CNC factory digital twin promo (90 s, enterprise audience, signed ICMA Lab) — `examples/cnc-twin/`
+> Case study: CNC factory digital twin promo (90 s, enterprise audience, signed ICMA Lab) — `examples/cnc-twin/CASE-STUDY.md` explains every decision.
+>
+> **This skill teaches a method, not a template**: the AI designs the story, shots and visuals for *your* product and audience instead of reusing the CNC film's scenes.
 
 This is an **Agent Skill** (`SKILL.md`) for Google Antigravity, Claude Code and other skill-capable agents. It builds on [motion-video-skill](https://github.com/nutcelvischen-jpg/motion-video-skill/tree/en) — **install both**.
 
@@ -49,18 +51,21 @@ Output: `videos/<name>/out/<name>_en_final.mp4`.
 ```bash
 P=.agents/skills/product-promo-video; MV=.agents/skills/motion-video
 python $P/scripts/new_promo.py videos/demo --mv $MV
+# references/01–03: use the product → design the story (script.json) → design shots (shots.json)
 python $P/scripts/capture.py videos/demo/shots.json --out videos/demo/assets/clips --test
 python $P/scripts/capture.py videos/demo/shots.json --out videos/demo/assets/clips
 set -a; source ~/.openrouter.env; set +a
 python $MV/scripts/tts.py videos/demo --lang en
 python $P/scripts/align_timeline.py videos/demo --mv $MV --lang en --target 90
-python $MV/scripts/render.py videos/demo --preview && python $MV/scripts/render.py videos/demo --sheet
+python $MV/scripts/render.py videos/demo --preview
+# references/04–05: design each scene on the index.html skeleton
+python $MV/scripts/render.py videos/demo --sheet
 python $P/scripts/music.py videos/demo/music.json --timeline videos/demo/timeline_en.json --out videos/demo/bgm.wav
 python $P/scripts/sfx.py videos/demo/sfx.json --timeline videos/demo/timeline_en.json --out videos/demo/sfx.wav
 python $MV/scripts/render.py videos/demo --lang en --crf 18
 python $P/scripts/mix.py videos/demo --lang en
 ```
-Full guide: [SKILL.md](SKILL.md); details in `references/`.
+Full guide: [SKILL.md](SKILL.md); the method lives in `references/01–07`.
 
 ## 4. Key techniques
 

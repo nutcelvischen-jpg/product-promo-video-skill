@@ -1,190 +1,126 @@
 ---
 name: product-promo-video
-description: Turn any product that runs in a browser (website, dashboard, 3D digital twin, SaaS) into an agency-grade landscape promo video — marketing script, real product footage captured frame by frame, push-ins and callouts, AI voice-over, music and sound design — rendered to MP4. Use when the user asks for a product video, demo video, promo for clients, or "record my system and make it a video". Requires motion-video-skill.
+description: Guides an AI agent to make a professional promo video, in code, for any product that runs in a browser (website, dashboard, 3D digital twin, SaaS) — use the product first, design the story for a specific audience, derive shots from the narration, capture real footage frame by frame, design motion graphics in HTML/GSAP, add voice-over, music and a mix, and render MP4. Use when the user asks for a product video, demo video, promo for clients, or "turn my system into a video". Requires motion-video-skill (render engine).
 ---
 
-# Product Promo Video Skill — turn a web product into a professional promo
+# Product Promo Video — making product videos with code
 
-This skill extends [motion-video-skill](https://github.com/nutcelvischen-jpg/motion-video-skill/tree/en):
-motion-video is the engine (animation + TTS + rendering); this skill adds **real product footage** and **marketing craft**.
+## What this skill teaches
 
-| Adds | With |
-|---|---|
-| Real UI / 3D / WebGL footage, captured frame by frame at a smooth 30 fps | `scripts/capture.py` + `scripts/vt.js` (virtual clock) |
-| Agency script structure (pain → reveal → features → scenarios → value → sign-off) | `references/storyboard-marketing.md` |
-| Push-ins, callouts, transitions, logo end card | `templates/promo-wide/index.html` |
-| Voice-over speed-up + sentence alignment to real pauses | `scripts/align_timeline.py` |
-| Music from loops, synthesized SFX, broadcast-style mix | `scripts/music.py`, `sfx.py`, `mix.py` |
-| Contact sheets for review | `scripts/contact_sheet.py` |
+Not a template — a **method**: how to understand a product, find the story for a particular audience, turn every line of narration into something filmable, and use code to lock picture, type and sound together.
 
-Full example: `examples/cnc-twin/` (CNC factory digital twin, 90 s, enterprise audience, signed ICMA Lab).
+`examples/cnc-twin/` is a complete case study. **Read it to understand decisions, not to reuse them.** Every product has a different audience, selling point, interface and palette. If your video would still work after swapping in the CNC product's name, you copied instead of designing.
 
-`<P>` = this skill folder, `<MV>` = motion-video skill folder. Run everything from the **workspace root**; videos live in `videos/<name>/`.
+## Core principles
+
+1. **User first, director second.** Don't write a line before you've operated the product yourself. A video can only sell what the product really does *and* what a camera can show.
+2. **The audience decides everything.** The same product pitches risk and cost to executives, innovation to judges, fun and learnability to students. Structure, tone, length and which features to show all follow from that.
+3. **Narration is the clock.** Every cut, animation and music change is tied to line times (`L(i,j)`), never hard-coded seconds. Change a line and the whole film realigns.
+4. **Every line must be acted out on screen.** Say "click" — show the click. Say "drops" — show the number drop. Unshown claims are unbelievable claims.
+5. **Real footage beats illustration.** Real product footage persuades; motion graphics guide the eye and explain the invisible. They don't replace the product.
+6. **One thing at a time.** At most 3 focal elements on screen; use push-ins, dimming and callouts to lead the eye.
+7. **Honesty.** Label simulated data, footnote example parameters, put unbuilt features under "next", never invent customers or results. One exaggeration ruins an enterprise video's credibility.
+8. **Look at everything.** Open every capture, contact sheet and final frame sample. Never assume the code "should" have worked.
+
+## Tools and responsibilities
+
+| Layer | Tool | What *you* decide |
+|---|---|---|
+| Render engine (TTS, subtitles, timeline, frame output) | motion-video-skill: `tts.py`, `render.py`, `wide` runtime | voice, tone, format |
+| Real footage capture | `scripts/capture.py` + `vt.js` (virtual clock — smooth 30 fps even for 3D) | which shots, which frame each action happens on, camera moves |
+| Animation skeleton | `templates/promo-wide/index.html` (footage layer + timing helpers only, **no scenes**) | every scene, layout, text, transition |
+| Voice alignment | `scripts/align_timeline.py` | target length, whether to cut lines |
+| Sound | `scripts/music.py`, `sfx.py`, `mix.py`, `apple_loops.py` | style, arrangement, where the hits go |
+| Review | `scripts/contact_sheet.py`, `render.py --sheet` | your eyes |
+
+`<P>` = this skill folder, `<MV>` = motion-video skill folder. Videos live in `videos/<name>/`.
 
 ---
 
-## Pipeline (in order — each step has a checkpoint)
+## Workflow
 
-```
-0 setup → 1 use the product → 2 script (user approves) → 3 scaffold → 4 shot list + test capture → 5 capture
-→ 6 voice + align → 7 animate → 8 contact-sheet review → 9 music + SFX → 10 render + mix → 11 final review → 12 deliver
-```
+Each step lists what to think through, what it produces, and a checkpoint. Each output feeds the next step.
 
-Rough time for 90 s: script 15 min, capture 20–60 min (background), animation 30–60 min, render 10–15 min.
+### 1. Understand the product → `references/01-product-discovery.md`
+**Think:** whose problem does it solve? What is its most impressive moment (the money shot)? Which features will be unreadable on video?
+Read the docs → run it → operate every feature with Playwright and screenshot → stitch a contact sheet and look.
+**Output:** feature list (filmable / needs push-in / unreadable — suggest code change), money-shot candidates, palette and fonts.
+**Checkpoint:** report suggested code changes as *recommended / optional / not needed*. Film after the user changes the code.
 
----
+### 2. Design the story → `references/02-story-design.md`
+**Think:** who watches, what should they do afterwards, what is the one-line value proposition, which narrative structure fits (problem→solution, result-first, before/after, day-in-the-life, feature tour, architecture explainer…)?
+Don't apply a fixed scene list. Write the message hierarchy first, then pick a structure, then a beat sheet, then lines.
+**Output:** `script.json`, with the shot that will act out each line noted beside it.
+**Checkpoint:** user approves the lines.
 
-## Step 0: Setup
+### 3. Design shots → `references/03-shot-design.md`
+**Think:** what picture makes each beat believable? Full-screen 3D (cine) or the whole UI (ui)? Which frame must the key action land on?
+**Output:** `shots.json`. `--test` capture, review, then full capture (background; do steps 4–5 meanwhile).
+**Checkpoint:** every key action happened; every camera move starts and ends well.
 
+### 4. Voice and timing → `references/05-timing-and-sync.md`
+`tts.py` (audition one scene first), then `align_timeline.py --target <seconds>`. From then on, that timeline is the clock.
+
+### 5. Visual language and animation → `references/04-visual-language.md`, `05-timing-and-sync.md`
+**Think:** what should this film look like? The answer is in the product: reuse its palette, fonts and semantic colors so meaning matches between film and product. What "I don't get it" problem does each scene solve, and which technique leads the eye?
+Start from the `new_promo.py` skeleton and **design every scene yourself**. Techniques are a toolbox, chosen by purpose — invent new ones when needed.
+**Checkpoint:** `render.py --sheet`, one frame per line, every frame inspected (`references/07-review.md`).
+
+### 6. Sound → `references/06-sound-design.md`
+**Think:** music follows the story's emotional curve — restrained pain, opening up at the reveal, space under the key line, a resolved ending. SFX only at real turning points.
+
+### 7. Render, mix, review, deliver
 ```bash
-git clone -b en https://github.com/nutcelvischen-jpg/motion-video-skill .agents/skills/motion-video
-pip install playwright numpy pillow imageio-ffmpeg && python -m playwright install chromium
-python <MV>/scripts/check_env.py
-ffmpeg -version     # mix.py / align_timeline.py need system ffmpeg
-```
-- TTS key via env var `OPENROUTER_API_KEY` (or `GEMINI_API_KEY`). **Never write it into files or the chat.** Ask the user to store it in a hidden file (`~/.openrouter.env`, `chmod 600`) and load with `set -a; source ~/.openrouter.env; set +a`.
-- Homebrew Python on macOS showing `CERTIFICATE_VERIFY_FAILED`: `export SSL_CERT_FILE=/etc/ssl/cert.pem`.
-- Cloud sandboxes often cannot reach the TTS API or Google Fonts: run TTS on the user's machine; use local fonts (the template ships Manrope + Noto Sans CJK fallback).
-
-## Step 1: Use the product first (never skip)
-
-Goal: know what is worth filming and what will be unreadable on video.
-
-1. Read the product's `README.md` / `PRODUCT.md` / `DESIGN.md`: features, palette, fonts, real vs. simulated data.
-2. Serve it: static `cd dist && python -m http.server 8766`; Vite: `npm run build` then the same (or `npm run dev`).
-3. Open it with Playwright and **list every button label** (you'll need them for the shot list).
-4. Click through each main feature, screenshot, stitch a contact sheet and look at it. Watch for:
-   - **Features whose change is barely visible** (e.g. a layer that only tints slightly) → push in on video, or suggest a code change for more contrast.
-   - **Camera presets that barely differ** → use mouse-drag orbits (`drag` in capture.py).
-   - **The selector of the 3D canvas container** (e.g. `.scene-area` / `#scene`) → needed for full-screen "cine" shots.
-   - Toasts, modals, logins, state persisted in localStorage.
-5. Report to the user in three buckets — *recommended changes / optional / no change needed* — with reasons. **Film after they change the code**, or you'll re-shoot.
-
-## Step 2: Marketing script (user approves lines before moving on)
-
-Read `references/storyboard-marketing.md`. Defaults if not specified:
-
-| Item | Default |
-|---|---|
-| Length | 90 s (≈ 210–230 English words / 330–360 Chinese characters) |
-| Audience | Enterprise decision makers |
-| Voice | `Charon`/`Aoede` (en) or `Leda` (Taiwanese Mandarin) + "keynote narrator: calm, professional, confident" |
-| Sign-off | The user's lab / company |
-
-Standard 8-scene structure: **pain hook → product reveal → core feature → how it works / layers → scenario simulation → quantified value → scale & roadmap → tagline + sign-off**.
-
-Rules:
-- One idea per line; for TTS pronunciation use `["spoken", "displayed"]` (e.g. `["C N C", "CNC"]`, `["three D", "3D"]`).
-- **Honesty**: label simulated data on screen; footnote example coefficients; future features only as "next"; never invent customers or results. If the hook uses a dramatized number, tell the user at delivery.
-- Next to each line, note which shot covers it — and the shot must be capturable from the real product.
-
-## Step 3: Scaffold
-
-```bash
-python <P>/scripts/new_promo.py videos/<name> --mv <MV>
-```
-Put the approved lines in `script.json`; set `:root` colors in `index.html` to the product palette; put the product font in `assets/fonts/`.
-
-## Step 4: Shot list + test capture
-
-Read `references/capture-guide.md`. Edit `shots.json`:
-
-- `mode: "cine"` — 3D canvas only, full screen (reveal, layers, cinematic orbits).
-- `mode: "ui"` — the whole interface (clicks, numbers changing, forms); push in later in the animation.
-- Actions at frame N (30 frames = 1 s): `click` (button text), `drag` (orbit), `type` (typing), `fill`, `select`, `eval`.
-- 240–270 frames per shot; **put the key action at frame 20–30** so it is easy to sync.
-
-```bash
-python <P>/scripts/capture.py videos/<name>/shots.json --out /tmp/test_clips --test
-python <P>/scripts/contact_sheet.py clips /tmp/test_clips      # open sheet_clips.jpg
-```
-Check the clicks happened (log prints "找不到按鈕文字" = button not found), orbits don't swing behind the model, toasts/modals behave.
-
-## Step 5: Capture (background)
-
-```bash
-nohup python <P>/scripts/capture.py videos/<name>/shots.json --out videos/<name>/assets/clips --jobs 2 > capture.log 2>&1 &
-```
-- No GPU: 1–2.5 s/frame for full-screen 3D, ~1 s/frame for UI → 30–60 min. **Do steps 6–7 meanwhile.**
-- Mac with GPU: add `"channel": "chrome", "gpu": true` → 5–10× faster.
-- Always review with `contact_sheet.py clips`.
-
-## Step 6: Voice-over + alignment
-
-```bash
-python <MV>/scripts/tts.py videos/<name> --lang en --only s01   # audition one scene
-python <MV>/scripts/tts.py videos/<name> --lang en
-python <P>/scripts/align_timeline.py videos/<name> --mv <MV> --lang en --target 90
-python <MV>/scripts/render.py videos/<name> --preview
-```
-- TTS usually runs 5–10% long; `--target` computes the speed-up (0.95–1.08 is inaudible; above 1.12 cut lines instead).
-- Sentence boundaries snap to real pauses so cuts land precisely.
-- After re-doing one scene: `tts.py --only s03` then `align_timeline.py ... --refresh s03`.
-
-## Step 7: Animate (index.html)
-
-Read `references/motion-recipes.md`, then `examples/cnc-twin/index.html`.
-
-- Each shot is a `.clip`; `clip(sel, t0, t1, skip)` = "show frame `skip` at t0"; `tick()` swaps frames.
-- **Tie every time to the narration**: `S(i).start`, `L(i,j)`, `LM(i,j,k)` — never hard-code seconds.
-- Sync rule: action at frame F, should land at time T → `clip(sel, T - F/30, ...)`.
-- Transitions `cutIn`; push-ins `zoomTo(sel, x, y, scale, t)`; slow drift `drift`.
-- Max 3 focal elements at once; keep the bottom 160 px for subtitles; keep the "demo · simulated data" tag while product footage is on screen.
-
-## Step 8: Contact-sheet review (repeat until clean)
-
-```bash
-python <MV>/scripts/render.py videos/<name> --sheet
-python <MV>/scripts/render.py videos/<name> --stills 41.5,68
-```
-**Open and look.** Use `references/qa-checklist.md`. Usual bugs: a previous clip not hidden, cards pushed off-screen (`.glass` position conflict), text over the 3D subject, subtitles covered.
-
-## Step 9: Music + SFX
-
-Read `references/audio-guide.md`.
-```bash
-python <P>/scripts/apple_loops.py list --genre Chillwave          # macOS only
-python <P>/scripts/apple_loops.py beats --bars-of 9.6
-python <P>/scripts/apple_loops.py convert "07 Chillwave/Forward Progress Synth" "07 Chillwave/Forward Progress Bass" "07 Chillwave/Matchbox Beat 01" --out videos/<name>/loops
-python <P>/scripts/music.py videos/<name>/music.json --timeline videos/<name>/timeline_en.json --out videos/<name>/bgm.wav
-python <P>/scripts/sfx.py   videos/<name>/sfx.json   --timeline videos/<name>/timeline_en.json --out videos/<name>/sfx.wav
-```
-Key moves: `anchor` puts a downbeat on the reveal; low-pass the intro and open it at the reveal; drop the drums for two bars under the key line; strip down for the outro.
-
-## Step 10: Render + mix
-
-```bash
-python <MV>/scripts/render.py videos/<name> --lang en --crf 18 --workers 2
+python <MV>/scripts/render.py videos/<name> --lang en --crf 18
 python <P>/scripts/mix.py videos/<name> --lang en --max-mb 30
-```
-`--crf 18` keeps UI detail sharp (~30 MB for 90 s). mix.py: compressed voice, side-chain-ducked music, SFX, loudnorm −15 LUFS → `out/<name>_en_final.mp4` (+ `_small.mp4` if over `--max-mb`).
-
-## Step 11: Final review
-
-```bash
 python <P>/scripts/contact_sheet.py video videos/<name>/out/<name>_en_final.mp4 --every 4
 ```
-Every frame matches its subtitle, no black frames at cuts, logo appears, length on target. **Ask the user to listen** — accent, mispronunciations, music level.
-
-## Step 12: Deliver
-
-Final MP4 (or `_small.mp4`), the project sources (`index.html`, `script.json`, `shots.json`, `music.json`, `sfx.json`, timeline). `assets/clips/` is large and can be re-captured. Report length, size, loudness, anything dramatized/illustrative the user must confirm, and next options (other language, 15 s cut, vertical).
+At delivery, state length, size, anything dramatized or illustrative the user must confirm, and that they need to listen to it.
 
 ---
 
-## Top 5 problems (more in `references/troubleshooting.md`)
-1. **Screenshot hangs** — Playwright `page.clock` was used; use `vt.js` (capture.py does).
-2. **A frame shows the previous image** — the `__seek` override at the end of index.html was removed.
-3. **Card in the wrong place** — `.glass` sets `position:relative`; cards need `position:absolute!important`.
-4. **Wrong button clicked** — exact text match wins, then prefix; for duplicates use `click_sel`.
-5. **Action out of sync** — clip `t0` didn't subtract `frame / 30`.
+## Command reference
 
-## File map
+```bash
+pip install playwright numpy pillow imageio-ffmpeg && python -m playwright install chromium   # plus system ffmpeg
+python <P>/scripts/new_promo.py videos/<name> --mv <MV>
+python <P>/scripts/capture.py videos/<name>/shots.json --out /tmp/test --test
+python <P>/scripts/contact_sheet.py clips /tmp/test
+python <P>/scripts/capture.py videos/<name>/shots.json --out videos/<name>/assets/clips --jobs 2
+set -a; source ~/.openrouter.env; set +a        # key lives in a hidden file on the user's machine — never in the project or chat
+python <MV>/scripts/tts.py videos/<name> --lang en [--only s01]
+python <P>/scripts/align_timeline.py videos/<name> --mv <MV> --lang en --target 90 [--refresh s03]
+python <MV>/scripts/render.py videos/<name> --preview
+python <MV>/scripts/render.py videos/<name> --sheet          # or --stills 12.5,40
+python <P>/scripts/apple_loops.py list|beats|convert ...      # macOS
+python <P>/scripts/music.py videos/<name>/music.json --timeline videos/<name>/timeline_en.json --out videos/<name>/bgm.wav
+python <P>/scripts/sfx.py   videos/<name>/sfx.json   --timeline videos/<name>/timeline_en.json --out videos/<name>/sfx.wav
+python <MV>/scripts/render.py videos/<name> --lang en --crf 18
+python <P>/scripts/mix.py videos/<name> --lang en --max-mb 30
 ```
-<P>/
-├── SKILL.md
-├── scripts/  new_promo.py · capture.py + vt.js · align_timeline.py · music.py · apple_loops.py · sfx.py · mix.py · contact_sheet.py · ppvslib.py
-├── templates/promo-wide/   index.html · script.json · shots/music/sfx.json · fonts
-├── examples/cnc-twin/      full 90 s enterprise example (Traditional Chinese narration)
-└── references/  storyboard-marketing · capture-guide · motion-recipes · audio-guide · qa-checklist · troubleshooting
-```
+
+## Anti-patterns (stop and rethink)
+
+- Porting the CNC example's scenes, lines, colors or layout and changing the words.
+- Writing the script before operating the product.
+- Lines describing features the footage doesn't show (or the product can't do).
+- The same technique in every scene ("wipe + top-left tag" ×8) — techniques serve content.
+- Five tags, two paragraphs and a formula in one frame.
+- Hard-coded seconds.
+- Text on bright footage without a backing, or on top of the product subject.
+- Rendering the final without reviewing the contact sheet.
+- Presenting simulated data as real results, or the roadmap as shipped.
+
+## References
+
+| File | Content |
+|---|---|
+| `references/01-product-discovery.md` | Using the product, money shots, visibility audit, code-change suggestions |
+| `references/02-story-design.md` | Audience → message hierarchy → structure → beats → lines; honesty |
+| `references/03-shot-design.md` | From lines to shots; cine / ui; actions and camera; `shots.json` spec |
+| `references/04-visual-language.md` | Deriving visuals from the product; layout, type, color; technique toolbox |
+| `references/05-timing-and-sync.md` | Time model, sync formula, pacing, skeleton API |
+| `references/06-sound-design.md` | Voice, music arrangement, SFX, mix |
+| `references/07-review.md` | Self-review method and checklist |
+| `references/troubleshooting.md` | Common errors |
+| `examples/cnc-twin/CASE-STUDY.md` | Why each decision was made — and how it would change for another product |

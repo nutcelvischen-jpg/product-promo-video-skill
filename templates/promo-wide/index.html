@@ -1,221 +1,89 @@
 <!doctype html>
-<html><head><meta charset="utf-8"><title>PRODUCT · Promo</title>
+<html><head><meta charset="utf-8"><title>Promo</title>
 <link rel="stylesheet" href="_runtime/runtime.css">
 <style>
-/* ═══ 1. Brand colors & fonts: use the product's own design system (DESIGN.md / CSS variables) ═══ */
+/* ════════════════════════════════════════════════════════════════════
+   Skeleton: footage layer + timing helpers only. Every scene, layout and text is yours to design.
+   Read references/04-visual-language.md first: the look grows out of the product.
+   ════════════════════════════════════════════════════════════════════ */
+
+/* ① Design tokens: use the product's own palette and fonts (its CSS variables / DESIGN.md / sampled from screenshots) */
 @font-face{font-family:"Brand";src:url("assets/fonts/manrope.woff2") format("woff2");font-weight:200 800;font-display:block}
 :root{
-  --bg1:#15222a; --bg2:#0f171b; --bg3:#0a1013;          /* background: product bg, darkened */
-  --cream:#e6eeec; --muted:#8fa4a9; --champ:#a8c9c0;    /* text */
-  --gold:#87ddbb; --mint:#87ddbb;                      /* primary (runtime uses --gold as accent) */
-  --amber:#edc779; --blue:#91bff5; --rose:#ef806c;     /* secondary: match the product's semantic colors */
-  --line:rgba(135,221,187,.26); --glow-rgb:135,221,187;
+  --bg1:#1a1f24; --bg2:#121619; --bg3:#0b0e10;   /* background (product bg, darker) */
+  --cream:#eef1f2; --muted:#93a0a6;               /* primary / secondary text */
+  --gold:#7fd3b0;                                 /* accent: the runtime uses this variable — set to the product primary */
+  --line:rgba(255,255,255,.18);                   /* hairlines, outlines */
+  --glow-rgb:127,211,176;                         /* background glow color */
+  /* add the product's semantic colors, e.g. --ok / --warn / --energy — same meaning as in the product */
   --sans:"Brand","Noto Sans CJK TC","Noto Sans TC","PingFang TC",sans-serif;
 }
 body{font-family:var(--sans)}
 .h1,.h2,.serif,#chrome .brandmark{font-family:var(--sans)!important}
-#chrome .brandmark{font-weight:800;letter-spacing:.04em}
-#subbox{background:rgba(8,14,17,.72);font-family:var(--sans)} #subbox b{color:var(--mint)}
-.mint{color:var(--mint)} .coralc{color:var(--rose)}
 
-/* ═══ 2. Footage layers (do not change): each .clip is one captured shot ═══ */
+/* ② Footage layer (do not change): each .clip is one shot captured by capture.py */
 .clip{position:absolute;left:0;top:0;width:1920px;height:1080px;overflow:hidden;opacity:0}
 .clip img{position:absolute;left:0;top:0;width:1920px;height:1080px;display:block;transform-origin:50% 50%}
-.shade{position:absolute;inset:0;pointer-events:none}
-#topfade{position:absolute;left:0;top:0;width:1920px;height:200px;background:linear-gradient(180deg,rgba(8,13,16,.85),transparent);z-index:15;opacity:0}
-#botfade{position:absolute;left:0;bottom:0;width:1920px;height:260px;background:linear-gradient(0deg,rgba(8,13,16,.8),transparent);z-index:15;opacity:0}
-#demoTag{position:absolute;left:72px;top:112px;z-index:16;font-size:19px;letter-spacing:.12em;color:var(--muted);display:flex;align-items:center;gap:10px;opacity:0}
-#demoTag i{width:8px;height:8px;border-radius:50%;background:var(--mint);box-shadow:0 0 10px var(--mint);display:block}
+.shade{position:absolute;inset:0;pointer-events:none}   /* put inside a .clip as a mask so text has a backing */
 
-/* ═══ 3. Shared components ═══ */
-.tag{position:absolute;z-index:17;display:inline-flex;align-items:center;gap:14px;padding:14px 26px 14px 22px;border-radius:14px;background:rgba(10,18,21,.78);border:1px solid var(--line);backdrop-filter:blur(14px);font-size:30px;font-weight:700;white-space:nowrap;opacity:0;box-shadow:0 20px 50px rgba(0,0,0,.4)}
-.tag i{width:12px;height:12px;border-radius:50%;background:var(--mint);box-shadow:0 0 14px var(--mint);display:block}
-.tag small{font-size:20px;font-weight:600;color:var(--muted);letter-spacing:.14em;margin-right:4px}
-.tag.coral i{background:var(--rose);box-shadow:0 0 14px var(--rose)} .tag.amber i{background:var(--amber);box-shadow:0 0 14px var(--amber)} .tag.blue i{background:var(--blue);box-shadow:0 0 14px var(--blue)}
-.kin{position:absolute;z-index:17;font-weight:800;line-height:1.08;letter-spacing:-.01em}
-.kin .w{display:block;opacity:0}
-.callout{position:absolute;z-index:17;opacity:0}
-.callout .lb{font-size:34px;font-weight:800;white-space:nowrap;padding-left:22px;border-left:3px solid var(--mint)}
-.callout .lb small{display:block;font-size:20px;font-weight:600;color:var(--muted);letter-spacing:.18em;margin-bottom:6px}
-.card{position:absolute!important;z-index:17;opacity:0;background:rgba(10,18,21,.84)!important;padding:34px 44px}   /* ⚠ .glass sets position:relative, so force absolute here */
-.card .eb{font-size:20px;letter-spacing:.3em;color:var(--champ);font-weight:700}
-.card .eq{font-size:52px;font-weight:800;margin-top:14px;white-space:nowrap}
-.card .eq span{color:#b9cbcf;font-weight:600;margin:0 14px}
-.card .foot{margin-top:16px;font-size:20px}
-#grid{position:absolute;inset:0;opacity:0;background-image:linear-gradient(rgba(135,221,187,.06) 1px,transparent 1px),linear-gradient(90deg,rgba(135,221,187,.06) 1px,transparent 1px);background-size:80px 80px;-webkit-mask-image:radial-gradient(ellipse 70% 60% at 50% 50%,#000 30%,transparent 80%)}
-#flash{position:absolute;inset:0;background:radial-gradient(circle at 50% 50%,rgba(135,221,187,.35),transparent 60%);opacity:0;z-index:19;pointer-events:none}
-#dimAll{position:absolute;inset:0;background:rgba(8,13,16,.72);backdrop-filter:blur(10px);opacity:0;z-index:16}
+/* ③ Your scene styles go here.
+   Reminders: .glass sets position:relative — absolutely positioned cards need position:absolute!important;
+              containers without .abs need position:absolute;
+              top 140px is the brand bar, bottom 160px the subtitles. */
 
-/* ═══ 4. This film's layout (edit per storyboard) ═══ */
-/* S1 hook */
-#hookCard{left:500px;top:300px;width:920px}
-#hookCard .big{font-size:140px;font-weight:800;letter-spacing:-.03em;line-height:1;margin-top:18px}
-#q1{left:150px;top:210px} #q2{left:1450px;top:420px} #q3{left:330px;top:730px}
-#pain{left:0;width:1920px;top:430px;text-align:center;font-size:140px;opacity:0}
-/* S2 reveal */
-#heroShade{background:linear-gradient(90deg,rgba(8,13,16,.88) 0%,rgba(8,13,16,.55) 38%,rgba(8,13,16,0) 70%)}
-#titleShade{background:radial-gradient(ellipse 60% 55% at 50% 50%,rgba(8,13,16,.82),rgba(8,13,16,.55));opacity:0}
-#k1{left:110px;top:360px;font-size:100px}
-#title{position:absolute;left:0;width:1920px;top:330px;text-align:center;z-index:17}
-#title .eb{font-size:26px;letter-spacing:.42em;color:var(--mint);font-weight:700;opacity:0}
-#title .t{font-size:150px;font-weight:800;margin-top:22px;opacity:0}
-#title .s{font-size:30px;letter-spacing:.32em;color:var(--champ);margin-top:22px;font-weight:600;opacity:0}
-/* S3 feature: push-in + callouts */
-#coShade{position:absolute;left:0;top:0;width:1300px;height:1080px;background:linear-gradient(90deg,rgba(8,13,16,.85),rgba(8,13,16,.5) 70%,transparent);opacity:0;z-index:16}
-#co1{left:800px;top:380px} #co2{left:800px;top:520px} #co3{left:800px;top:660px}
-#formula{left:110px;top:640px}
-/* S4 scenario + big words */
-#k2{left:0;width:1920px;top:360px;text-align:center;font-size:140px}
-/* S5 close */
-#k3{left:0;width:1920px;top:370px;text-align:center;font-size:140px}
-#logo{position:absolute;left:0;width:1920px;top:300px;text-align:center;z-index:17}
-#logo .name{font-size:140px;font-weight:800;letter-spacing:-.02em;opacity:0}
-#logo .cn{font-size:34px;color:var(--champ);letter-spacing:.3em;margin-top:26px;font-weight:600;opacity:0}
-#logo .line{width:0;height:2px;background:var(--mint);margin:46px auto 40px;box-shadow:0 0 12px var(--mint)}
-#logo .tl{font-size:54px;font-weight:800;opacity:0}
-#logo .ft{font-size:20px;color:var(--muted);margin-top:40px;letter-spacing:.14em;opacity:0}
 </style></head>
 <body>
 <div id="stage">
-  <div id="grid"></div>
+  <!-- ④ Footage: order by appearance (later in DOM = on top).
+       data-clip = folder under assets/clips/; data-n = number of images in it.
+  <div id="c_overview" class="clip"><img data-clip="overview" data-n="255" src="assets/clips/overview/0000.jpg"></div>
+  -->
 
-  <!-- Footage: later in DOM = on top. data-n = frame count of assets/clips/<name>/ -->
-  <div id="c_hero" class="clip"><img data-clip="hero" data-n="255" src="assets/clips/hero/0000.jpg"><div id="heroShade" class="shade"></div><div id="titleShade" class="shade"></div></div>
-  <div id="c_feature" class="clip"><img data-clip="feature" data-n="240" src="assets/clips/feature/0000.jpg"></div>
-  <div id="c_layer" class="clip"><img data-clip="layer" data-n="255" src="assets/clips/layer/0000.jpg"><div class="shade" style="background:linear-gradient(90deg,rgba(8,13,16,.6),transparent 55%)"></div></div>
-  <div id="c_scenario" class="clip"><img data-clip="scenario" data-n="240" src="assets/clips/scenario/0000.jpg"></div>
+  <!-- ⑤ Your scene elements (text, cards, diagrams, SVG…) go here -->
 
-  <div id="topfade"></div><div id="botfade"></div>
-  <div id="demoTag"><i></i>DEMO · SIMULATED DATA</div>
-  <div id="coShade"></div>
-
-  <!-- S1 hook -->
-  <div id="hookCard" class="card glass"><div class="eb">PAIN POINT</div><div class="big num" id="hookNum">0</div><div class="foot" style="color:var(--muted)">just one number</div></div>
-  <div id="q1" class="tag"><i></i>Question one?</div>
-  <div id="q2" class="tag amber"><i></i>Question two?</div>
-  <div id="q3" class="tag blue"><i></i>Question three?</div>
-  <div id="pain" class="kin coralc">Invisible.</div>
-
-  <!-- S2 reveal -->
-  <div id="k1" class="kin"><span class="w">One line of</span><span class="w mint">product value.</span></div>
-  <div id="title"><div class="eb">LAB PRESENTS</div><div class="t">Product <span class="mint">Name</span></div><div class="s">ENGLISH TAGLINE</div></div>
-
-  <!-- S3 feature -->
-  <div id="co1" class="callout"><div class="lb"><small>METRIC 1</small>Metric one</div></div>
-  <div id="co2" class="callout"><div class="lb"><small>METRIC 2</small>Metric two</div></div>
-  <div id="co3" class="callout"><div class="lb"><small>METRIC 3</small>Metric three</div></div>
-  <div id="tagLayer" class="tag blue" style="left:72px;top:170px"><i></i><small>LAYER</small>Layer name</div>
-  <div id="formula" class="card glass"><div class="eb">HOW IT WORKS</div><div class="eq">Input<span>×</span>Factor<span>=</span><b class="mint">Result</b></div><div class="foot">*Example factor, illustration only</div></div>
-
-  <!-- S4 scenario -->
-  <div id="tagScn" class="tag coral" style="left:72px;top:170px"><i></i><small>SCENARIO</small>Scenario name</div>
-  <div id="dimAll"></div>
-  <div id="k2" class="kin"><span class="w">Simulate first,</span><span class="w mint">then decide.</span></div>
-
-  <!-- S5 close -->
-  <div id="k3" class="kin"><span class="w">Your memorable</span><span class="w mint">one-liner.</span></div>
-  <div id="logo"><div class="name">YOUR Lab</div><div class="cn">Organization full name</div><div class="line"></div><div class="tl">One clear <span class="mint">call to action</span>.</div><div class="ft">Demo footage uses simulated data</div></div>
-  <div id="flash"></div>
 </div>
 <script src="_runtime/gsap.min.js"></script>
 <script src="_tl.js"></script>
 <script src="_runtime/core.js"></script>
 <script>
-const CLIPS = [];   // tick() swaps each shot to the right frame
+const CLIPS = [];
 window.EPISODE = {
   strings: { zh: {}, en: {} },
   build(c) {
-    const { m, S, L, LE, LM } = c;
+    const { m, S, L, LE, LM } = c;          // time functions: S(i).start, L(i,j), LE(i,j), LM(i,j,k). Never hard-code seconds.
     const E = "expo.out", IO = "expo.inOut";
-    /* ── helpers (copy as is) ── */
+
+    /* ── helpers (use as is, or write your own) ── */
     const fadeIn = (sel, t, d = .7) => m.fromTo(sel, { opacity: 0 }, { opacity: 1, duration: d, ease: "power2.out" }, t);
     const fadeOut = (sel, t, d = .5) => m.to(sel, { opacity: 0, duration: d, ease: "power2.in" }, t);
     const pop = (sel, t) => m.fromTo(sel, { opacity: 0, y: 24, scale: .94 }, { opacity: 1, y: 0, scale: 1, duration: .7, ease: "back.out(1.6)" }, t);
     const words = (sel, t, gap = .4) => m.fromTo(sel + " .w", { opacity: 0, y: 70, filter: "blur(16px)" }, { opacity: 1, y: 0, filter: "blur(0px)", duration: 1, ease: E, stagger: gap }, t);
-    // clip(selector, t0, t1, skip): frame `skip` at t0, then 30 fps; holds last frame; auto-hides at t1+0.6
+    // footage: frame `skip` at t0, then 30 fps, holds the last frame; auto-hides at t1+0.6.
+    // sync formula: action at frame F should land at time T → clip(sel, T - F/30, t1)
     const clip = (sel, t0, t1, skip = 0) => { const el = c.$(sel); const img = el.tagName === "IMG" ? el : el.querySelector("img"); CLIPS.push({ img, t0, t1, skip, n: +img.dataset.n }); if (el.classList.contains("clip")) m.set(el, { opacity: 0 }, t1 + .6); };
-    // cutIn: right-to-left wipe (transition)
     const cutIn = (sel, t, d = .8) => m.fromTo(sel, { opacity: 0, clipPath: "inset(0 0 0 100%)" }, { opacity: 1, clipPath: "inset(0 0 0 0%)", duration: d, ease: IO }, t);
-    // zoomTo: scale around a point (push into a panel)
     const zoomTo = (sel, x, y, scale, t, d = 1.4) => { m.set(sel + " img", { transformOrigin: `${x}px ${y}px` }, t - .01); m.fromTo(sel + " img", { scale: 1 }, { scale, duration: d, ease: IO }, t); };
-    // drift: slow Ken Burns push for life in static shots
     const drift = (sel, t, d, s0 = 1.05, s1 = 1.18) => m.fromTo(sel + " img", { scale: s0 }, { scale: s1, duration: d, ease: "none" }, t);
+    // the runtime also provides c.rise / c.out / c.count / c.tilt / c.sheen / c.wipe / c.type (see motion-video's animation-cookbook)
 
-    /* ── S1 hook: pain number + three questions + contrast ── */
-    fadeIn("#grid", .2, 1.5);
-    c.rise("#hookCard", L(0, 0) + .1, 1.1);
-    c.count("#hookNum", 0, 1284600, L(0, 0) + .4, 2.2, v => Math.round(v).toLocaleString("en-US"));
-    pop("#q1", LM(0, 1, .02)); pop("#q2", LM(0, 1, .36)); pop("#q3", LM(0, 1, .68));
-    m.to(["#hookCard", "#q1", "#q2", "#q3"], { opacity: .18, filter: "blur(6px)", scale: .97, duration: .9 }, L(0, 2) - .1);
-    c.rise("#pain", L(0, 2) + .25, 1);
-    c.out(["#hookCard", "#q1", "#q2", "#q3", "#pain", "#grid"], S(1).start - .45, .5);
+    /* ── ⑥ Your scenes: write them beat by beat. For each, first ask "what must viewers see for this line?" ── */
 
-    /* ── S2 reveal: circle-reveal 3D hero → big words → title ── */
-    const s1 = S(1).start;
-    clip("#c_hero", s1 - .2, S(2).start + 1);
-    m.fromTo("#c_hero", { opacity: 1, clipPath: "circle(0% at 66% 50%)" }, { clipPath: "circle(120% at 66% 50%)", duration: 1.6, ease: IO }, s1 + .1);
-    m.fromTo("#c_hero img", { scale: 1.32 }, { scale: 1.12, duration: S(2).start - s1 + 1, ease: "power1.out" }, s1);
-    m.fromTo("#c_hero img", { x: 330 }, { x: 0, duration: 1.4, ease: IO }, L(1, 1) - .4);     // push subject right while text is on the left
-    words("#k1", L(1, 0) + .2, .45);
-    fadeIn(["#topfade", "#botfade", "#demoTag"], s1 + .6, .6);
-    c.out("#k1", L(1, 1) - .3, .5);
-    m.to("#heroShade", { opacity: 0, duration: .6 }, L(1, 1) - .3);
-    fadeIn("#titleShade", L(1, 1) - .2, .8);
-    c.rise("#title .eb", L(1, 1) + .05, 1); c.rise("#title .t", L(1, 1) + .3, 1.2); c.rise("#title .s", L(1, 1) + .7, 1);
-    fadeIn("#flash", L(1, 1) + .25, .2); fadeOut("#flash", L(1, 1) + .45, 1);
-    c.out("#title", S(2).start - .4, .5);
-
-    /* ── S3 feature: UI push-in + callouts; then 3D layer shot + formula card ── */
-    const s2 = S(2).start;
-    fadeOut("#c_hero", s2, .6);
-    clip("#c_feature", s2 - .4, L(2, 1) + .3);
-    cutIn("#c_feature", s2 - .35, .8);
-    zoomTo("#c_feature", 1870, 470, 1.85, s2 + .7, 1.6);                 // ← panel position (measure on a capture)
-    fadeIn("#coShade", LM(2, 0, .3), .6);
-    ["#co1", "#co2", "#co3"].forEach((s, k) => m.fromTo(s, { opacity: 0, x: -40 }, { opacity: 1, x: 0, duration: .6, ease: E }, LM(2, 0, .35 + k * .18)));
-    c.out(["#co1", "#co2", "#co3"], L(2, 1) - .35, .4); fadeOut("#coShade", L(2, 1) - .35, .4);
-    clip("#c_layer", L(2, 1) - .4, S(3).start + .3);
-    cutIn("#c_layer", L(2, 1) - .35, .9);
-    drift("#c_layer", L(2, 1) - .35, S(3).start - L(2, 1) + .6);
-    pop("#tagLayer", L(2, 1) + .2);
-    c.rise("#formula", LM(2, 1, .3), 1);
-    c.out(["#tagLayer", "#formula"], S(3).start - .35, .4);
-
-    /* ── S4 scenario: button pressed at frame 30 → land the press right after the question ── */
-    const s3 = S(3).start;
-    clip("#c_scenario", Math.min(LM(3, 0, .22) - 1.0, s3 - .3), L(3, 1) + .8);   // 1.0 = 30 frames / 30 fps
-    cutIn("#c_scenario", s3 - .3, .8);
-    zoomTo("#c_scenario", 1100, 150, 1.55, s3 + .2);
-    pop("#tagScn", s3 + .1); c.out("#tagScn", L(3, 1) - .2, .4);
-    fadeIn("#dimAll", L(3, 1) - .1, .7);
-    words("#k2", L(3, 1) + .2, .5);
-    c.out("#k2", S(4).start - .45, .5); fadeOut(["#dimAll", "#topfade", "#botfade", "#demoTag"], S(4).start - .3, .5);
-
-    /* ── S5 close: memorable line → logo ── */
-    const s4 = S(4).start;
-    fadeIn("#grid", s4 - .2, 1);
-    words("#k3", L(4, 0) - .05, .5);
-    c.out("#k3", L(4, 1) - .3, .45);
-    m.fromTo("#logo .name", { opacity: 0, scale: .9, filter: "blur(18px)" }, { opacity: 1, scale: 1, filter: "blur(0px)", duration: 1.2, ease: E }, L(4, 1) - .05);
-    fadeIn("#flash", L(4, 1) + .1, .2); fadeOut("#flash", L(4, 1) + .3, 1.2);
-    c.rise("#logo .cn", L(4, 1) + .35, 1);
-    m.to("#logo .line", { width: 520, duration: 1.2, ease: E }, L(4, 1) + .6);
-    c.rise("#logo .tl", L(4, 1) + .8, 1);
-    c.rise("#logo .ft", LE(4, 1) + .2, 1);
   },
   tick(t, c) {
+    // footage frame swap (keep)
     for (const k of CLIPS) {
       if (t < k.t0 - .05 || t > k.t1 + .05) continue;
       const f = Math.max(0, Math.min(k.n - 1, Math.floor((t - k.t0) * 30) + k.skip));
       const src = `assets/clips/${k.img.dataset.clip}/${String(f).padStart(4, "0")}.jpg`;
       if (k.img.getAttribute("src") !== src) k.img.setAttribute("src", src);
     }
+    // per-frame procedural animation (particles, dots along paths…) goes here — compute from t only
   }
 };
 </script>
 <script src="_runtime/runtime.js"></script>
 <script>
-/* Wait for each new frame to decode before the render screenshot (else stale frames). Do not remove. */
+/* Wait for each new frame to decode before the render screenshot, or you get stale frames. Keep this. */
 (() => {
   const base = window.__seek;
   window.__seek = (t) => {

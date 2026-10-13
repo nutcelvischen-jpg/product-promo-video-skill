@@ -1,13 +1,13 @@
 #!/usr/bin/env python3
-"""建立一支產品介紹影片的資料夾（以 motion-video-skill 的 wide 版型為底，換成 promo-wide 範本）。
+"""建立一支產品介紹影片的資料夾（以 motion-video-skill 的 wide 版型為底，換成 promo-wide 骨架）。
 
   python new_promo.py videos/my-product --mv .agents/skills/motion-video
 
 會產生：
   videos/my-product/
-    index.html        ← promo-wide 範本（素材層、放大、標註、大字、Logo）
-    script.json       ← 5 場景行銷腳本範本
-    shots.json        ← 鏡頭清單範本（capture.py 用）
+    index.html        ← 骨架：素材層＋時間工具（場景由你設計）
+    script.json       ← 空白腳本（依 references/02 設計）
+    shots.json        ← 空白鏡頭清單（依 references/03 設計）
     music.json / sfx.json
     assets/fonts/     ← 預設 Manrope；換成產品字型
     assets/clips/     ← capture.py 輸出
@@ -31,7 +31,7 @@ def main():
     for n in ("shots.json", "music.json", "sfx.json"):
         shutil.copy(t / n, f / n)
     (f / "assets" / "clips").mkdir(parents=True, exist_ok=True)
-    print(f"✓ 已建立 {f}\n  下一步：改 script.json → 改 shots.json → python {HERE}/scripts/capture.py {f}/shots.json --out {f}/assets/clips --test")
+    print(f"✓ 已建立 {f}\n  下一步：試用產品（references/01）→ 設計故事寫 script.json（02）→ 設計鏡頭寫 shots.json（03）")
 
 
 if __name__ == "__main__":

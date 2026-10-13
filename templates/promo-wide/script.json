@@ -3,23 +3,12 @@
   "size": [1920, 1080],
   "langs": ["en"],
   "voice": { "en": "Charon" },
-  "style": {
-    "en": "Keynote narrator for a technology brand: calm, professional, confident. Clear articulation, medium-slow pace, natural pauses between sentences. No announcer voice, no exaggeration."
-  },
+  "style": { "en": "(Write for your audience: who speaks, to whom, accent, pace, emotion.)" },
   "meta": {
-    "common": { "brand": "YOUR Lab" },
-    "en": { "event": "PRODUCT NAME", "hl": ["PRODUCT NAME", "keyword"] }
+    "common": { "brand": "(sign-off)" },
+    "en": { "event": "(product name)", "hl": [] }
   },
   "scenes": [
-    { "id": "s01", "dir": { "en": "Opening. Low and suspenseful, short pauses between questions." },
-      "en": ["One sentence of pain your client nods at.", "Question one? Question two? Question three?", "Most companies simply can't answer."] },
-    { "id": "s02", "dir": { "en": "Brighter, launch-event energy." },
-      "en": ["Now, one sentence of product value.", ["Your Lab presents, Product Name.", "YOUR Lab presents PRODUCT NAME."]] },
-    { "id": "s03", "dir": { "en": "Clear and steady." },
-      "en": ["One click shows the three numbers that matter.", "Switch layers, and the logic becomes obvious."] },
-    { "id": "s04", "dir": { "en": "Crisp question; slow down and land the last line." },
-      "en": ["Something happens? The system reacts instantly.", "Simulate before you decide."] },
-    { "id": "s05", "dir": { "en": "Slow, certain close." },
-      "en": ["Your memorable line.", ["Your Lab. One clear call to action.", "YOUR Lab. One clear call to action."]] }
+    { "id": "s01", "dir": { "en": "(how this scene differs in tone)" }, "en": ["(lines from your beat sheet)"] }
   ]
 }
