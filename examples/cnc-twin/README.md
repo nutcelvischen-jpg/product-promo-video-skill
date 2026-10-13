@@ -1,16 +1,16 @@
-# 範例：CNC 工廠數位孿生 介紹影片（企業客戶版，90 秒）
+# Example: CNC factory digital twin promo (enterprise, 90 s)
 
-產品：Three.js CNC 工廠數位孿生（模擬生產、電力、太陽能、碳排）。觀眾：企業客戶。片尾：ICMA Lab。
+Product: a Three.js CNC factory digital twin (simulated production, power, solar, carbon). Audience: enterprise clients. Sign-off: ICMA Lab. Narration is Traditional Chinese (Taiwan); the structure is language-independent.
 
-| 檔案 | 內容 |
+| File | Content |
 |---|---|
-| `script.json` | 8 場行銷腳本（痛點→登場→功能→圖層→情境→碳排→擴充→署名） |
-| `shots.json` | 10 個鏡頭：5 個 3D 電影鏡頭（cine）＋5 個介面鏡頭（ui） |
-| `index.html` | 完整動畫（瀏覽器框傾斜浮入、推鏡＋標註、公式卡、KPI 三卡、IoT 架構圖、Logo） |
-| `music.json` | Apple Loops「Forward Progress」Synth/Bass/Guitar ＋「Matchbox Beat 01」，100 BPM |
-| `sfx.json` | 11 個轉場 whoosh、3 個 boom、3 個 tick |
+| `script.json` | 8-scene marketing script (pain → reveal → feature → layers → scenarios → carbon → scale → sign-off) |
+| `shots.json` | 10 shots: 5 cine (full-screen 3D) + 5 UI |
+| `index.html` | Full animation (tilted browser frame, push-ins + callouts, formula card, KPI cards, IoT diagram, logo) |
+| `music.json` | Apple Loops "Forward Progress" Synth/Bass/Guitar + "Matchbox Beat 01", 100 BPM |
+| `sfx.json` | 11 whooshes, 3 booms, 3 ticks |
 
-重現步驟（需要 factory-twin 產品本體，放在 http://localhost:8766）：
+Reproduce (needs the factory-twin app at http://localhost:8766):
 ```bash
 python <P>/scripts/new_promo.py videos/cnc-twin --mv <MV>
 cp <P>/examples/cnc-twin/*.json <P>/examples/cnc-twin/index.html videos/cnc-twin/
@@ -24,8 +24,8 @@ python <MV>/scripts/render.py videos/cnc-twin --lang zh --crf 18
 python <P>/scripts/mix.py videos/cnc-twin --lang zh --max-mb 30
 ```
 
-製作時遇到並已寫進 skill 的坑：
-- 圖層切換在小畫面看不出差異 → 請產品端加強 3D 顏色與粒子，再拍。
-- 「場外太陽能」同時是清單項目與鏡頭按鈕 → 文字完全相同優先。
-- `.glass` 的 `position:relative` 讓公式卡跑到畫面外 → `.card` 強制 absolute。
-- TTS 比估計長 6% → `align_timeline.py --target 90`。
+Lessons baked into the skill:
+- Layer changes were invisible at small size → the product was updated with stronger 3D colors and particles before filming.
+- "場外太陽能" was both a list item and a camera button → exact text match first.
+- `.glass` `position:relative` pushed the formula card off-screen → `.card` forces absolute.
+- TTS ran 6% long → `align_timeline.py --target 90`.

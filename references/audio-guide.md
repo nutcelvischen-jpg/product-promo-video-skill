@@ -1,69 +1,54 @@
-# 聲音：配音、配樂、音效、混音
+# Sound: voice, music, SFX, mix
 
-## 1. 配音（motion-video-skill 的 tts.py）
+## 1. Voice (motion-video-skill tts.py)
+1. Audition scene 1 only (`--only s01`) and let the user approve accent and pace.
+2. Generate all, then `align_timeline.py --target 90`:
+   - computes an `atempo` speed-up (pitch preserved). 0.95–1.08 is inaudible; > 1.12 → cut lines.
+   - snaps sentence starts to real pauses (tts.py only estimates by length).
+3. Fixes: wrong accent → state it in `style`; mispronunciations → `["spoken", "displayed"]`; flat delivery → concrete `dir` per scene.
 
-1. 先只做第一場試聽：`tts.py videos/x --lang zh --only s01`，請使用者確認口音與語速。
-2. 全部產生後跑 `align_timeline.py --target 90`：
-   - 計算加速倍率（ffmpeg `atempo`，音高不變）。0.95～1.08 聽不出來；超過 1.12 會趕，應該刪台詞。
-   - 用靜音偵測把每句的開始時間吸附到真正的停頓（tts.py 原本是按字數比例估計）。
-3. 聽起來不對：
-   - 口音偏中國大陸 → style 一定要寫「台灣口音的華語」。
-   - 念錯字、英文縮寫 → `["念法", "顯示"]`。
-   - 語氣太平 → 每場 `dir` 寫具體情緒（懸念、轉亮、加重、放慢）。
+## 2. Music: Apple Loops (macOS)
+GarageBand ships ~1,700 Apple Loops (`/Library/Audio/Apple Loops/Apple/`), royalty-free for use in your own productions (the loop files themselves may not be redistributed).
 
-## 2. 配樂：Apple Loops（Mac）
+1. `apple_loops.py list --genre Chillwave` → pick one **family** (e.g. Forward Progress Bass / Synth / Guitar): same tempo and key.
+2. Tempo from length: 9.6 s = 4 bars @ 100 BPM; 8.0 s = 4 bars @ 120 BPM.
+3. `apple_loops.py beats --bars-of 9.6` → drum loops of 4.8 / 9.6 s.
+4. `apple_loops.py convert ... --out videos/x/loops`.
 
-GarageBand 內建約 1,700 個 Apple Loops（`/Library/Audio/Apple Loops/Apple/`），可免版稅用在自己的影片作品中。
-
-選曲步驟：
-1. `apple_loops.py list --genre Chillwave`：找同一個「家族」（例 Forward Progress Bass / Synth / Guitar）——同 BPM、同調，可直接疊。
-2. 看家族的長度推 BPM：9.6 秒 = 100 BPM 四小節；8.0 秒 = 120 BPM 四小節。
-3. `apple_loops.py beats --bars-of 9.6`：找長度是 4.8 / 9.6 秒的鼓組。
-4. `apple_loops.py convert ... --out videos/x/loops`。
-
-曲風建議：
-| 影片調性 | 曲風資料夾 | 備註 |
+| Tone | Folder | Note |
 |---|---|---|
-| 企業／科技／工業 | 07 Chillwave | 平穩、有現代感；避開 Vox（人聲） |
-| 新創／活潑 | 02 Electro House、08 Indie Disco | 選鼓組較簡單的 |
-| 溫暖／教育 | Apple Loops for GarageBand（原聲吉他、鋼琴） | |
+| Enterprise / tech / industrial | 07 Chillwave | steady, modern; avoid Vox |
+| Startup / upbeat | 02 Electro House, 08 Indie Disco | simpler drum loops |
+| Warm / education | Apple Loops for GarageBand (acoustic, piano) | |
 
-> 選曲時無法試聽的話：先用 numpy 算 RMS 與頻譜重心（重心越高越「刺」），企業片選重心較低、較不吵的鼓組，最後**一定請使用者聽**。
+Can't audition? Compare RMS and spectral centroid with numpy (higher centroid = harsher); pick calmer drums for enterprise — and **have the user listen**.
 
-## 3. 編排（music.json）
-
-段落起落綁旁白時間，跟畫面情緒一致：
-
-| 段落 | 做法 |
+## 3. Arrangement (music.json)
+| Section | Move |
 |---|---|
-| 開場痛點 | 只有旋律，低通濾波 500→2600 Hz（悶悶的、壓抑） |
-| 產品登場 | `anchor` 設在登場瞬間 → 強拍落在這裡；濾波全開、貝斯與鼓同時進來（配 boom 音效） |
-| 功能段 | 旋律＋貝斯＋鼓；原理段之後加第三層（吉他）增加推進感 |
-| 重點金句 | 抽掉鼓兩小節（`L(i,j)` 到 `L(i,j)+2*BAR`），讓金句被聽見 |
-| 收尾 | 鼓先退、旋律與貝斯保留，最後 3 秒淡出 |
+| Pain hook | melody only, low-pass 500→2600 Hz (muffled tension) |
+| Reveal | `anchor` = reveal time → downbeat lands there; filter opens; bass + drums enter (with boom) |
+| Features | melody + bass + drums; add a third layer after "how it works" |
+| Key line | drop drums for two bars (`L(i,j)` → `L(i,j)+2*BAR`) |
+| Outro | drums out, melody + bass, 3 s fade |
 
-gain 與 lowpass 都是 `[時間, 值]` 折線；時間可寫 `S(1)+0.1`、`L(4,2)+2*BAR`、`END-3`。
+`gain` / `lowpass` are `[time, value]` polylines; times accept `S(1)+0.1`, `L(4,2)+2*BAR`, `END-3`.
 
-## 4. 音效（sfx.json）
-
-| 類型 | 用在 | 建議音量 |
+## 4. SFX (sfx.json)
+| Type | Use | Gain |
 |---|---|---|
-| whoosh（0.6～0.8 秒） | 每個擦入轉場，`offset: -0.25` 讓峰值落在切換點；`alt_pan` 左右交替 | 0.14～0.2 |
-| boom | 產品登場、片名閃光、Logo 出現 | 0.35～0.5 |
-| tick | 問題膠囊、標籤一個個跳出 | 0.2 |
-| riser（2 秒） | 大轉折前（選用） | 0.15 |
+| whoosh 0.6–0.8 s | every wipe; `offset: -0.25`; `alt_pan` | 0.14–0.2 |
+| boom | reveal, title flash, logo | 0.35–0.5 |
+| tick | pills/tags popping | 0.2 |
+| riser 2 s | before a big turn (optional) | 0.15 |
 
-音效是程式合成的，沒有版權問題。不要每個動作都配，主要轉場＋三個重擊點就夠。
+All synthesized — no licensing. Main cuts + three hits is enough.
 
-## 5. 混音（mix.py）
-
-訊號流程：
+## 5. Mix (mix.py)
 ```
-旁白 → 高通 80Hz → 壓縮 3:1 ─┬────────────────────┐
-                               └→ 側鏈鍵 ─┐          ├→ amix → loudnorm(-15 LUFS, TP -1.5) → AAC 192k
-背景音樂 × 0.30 ─────────→ sidechaincompress ┘          │
-音效 ─────────────────────────────────────────────┘
+voice → HPF 80 Hz → comp 3:1 ─┬──────────────────────┐
+                              └→ sidechain key ─┐      ├→ amix → loudnorm(-15 LUFS, TP -1.5) → AAC 192k
+music × 0.30 ──────────→ sidechaincompress ─────┘      │
+sfx ───────────────────────────────────────────────────┘
 ```
-- `--music`：0.25（旁白很多）～0.35（旁白少）。
-- `--lufs`：網路 -14～-16；會議室投影 -16～-18。
-- 交付前確認：`ebur128` 整體響度、開頭 0.4 秒與結尾不要有爆音。
+`--music` 0.25 (wordy) – 0.35 (sparse). `--lufs` −14…−16 web, −16…−18 meeting rooms.

@@ -2,13 +2,13 @@
 <html><head><meta charset="utf-8"><title>PRODUCT · Promo</title>
 <link rel="stylesheet" href="_runtime/runtime.css">
 <style>
-/* ═══ 1. 品牌色與字型：換成產品自己的設計系統（看產品的 DESIGN.md / CSS 變數） ═══ */
+/* ═══ 1. Brand colors & fonts: use the product's own design system (DESIGN.md / CSS variables) ═══ */
 @font-face{font-family:"Brand";src:url("assets/fonts/manrope.woff2") format("woff2");font-weight:200 800;font-display:block}
 :root{
-  --bg1:#15222a; --bg2:#0f171b; --bg3:#0a1013;          /* 底色：取產品背景色再壓暗 */
-  --cream:#e6eeec; --muted:#8fa4a9; --champ:#a8c9c0;    /* 文字 */
-  --gold:#87ddbb; --mint:#87ddbb;                      /* 主色（runtime 用 --gold 當重點色） */
-  --amber:#edc779; --blue:#91bff5; --rose:#ef806c;     /* 輔助色：跟產品 UI 的語意色一致 */
+  --bg1:#15222a; --bg2:#0f171b; --bg3:#0a1013;          /* background: product bg, darkened */
+  --cream:#e6eeec; --muted:#8fa4a9; --champ:#a8c9c0;    /* text */
+  --gold:#87ddbb; --mint:#87ddbb;                      /* primary (runtime uses --gold as accent) */
+  --amber:#edc779; --blue:#91bff5; --rose:#ef806c;     /* secondary: match the product's semantic colors */
   --line:rgba(135,221,187,.26); --glow-rgb:135,221,187;
   --sans:"Brand","Noto Sans CJK TC","Noto Sans TC","PingFang TC",sans-serif;
 }
@@ -18,7 +18,7 @@ body{font-family:var(--sans)}
 #subbox{background:rgba(8,14,17,.72);font-family:var(--sans)} #subbox b{color:var(--mint)}
 .mint{color:var(--mint)} .coralc{color:var(--rose)}
 
-/* ═══ 2. 素材層（不要改）：每個 .clip 是一段逐格擷取的畫面 ═══ */
+/* ═══ 2. Footage layers (do not change): each .clip is one captured shot ═══ */
 .clip{position:absolute;left:0;top:0;width:1920px;height:1080px;overflow:hidden;opacity:0}
 .clip img{position:absolute;left:0;top:0;width:1920px;height:1080px;display:block;transform-origin:50% 50%}
 .shade{position:absolute;inset:0;pointer-events:none}
@@ -27,7 +27,7 @@ body{font-family:var(--sans)}
 #demoTag{position:absolute;left:72px;top:112px;z-index:16;font-size:19px;letter-spacing:.12em;color:var(--muted);display:flex;align-items:center;gap:10px;opacity:0}
 #demoTag i{width:8px;height:8px;border-radius:50%;background:var(--mint);box-shadow:0 0 10px var(--mint);display:block}
 
-/* ═══ 3. 共用元件 ═══ */
+/* ═══ 3. Shared components ═══ */
 .tag{position:absolute;z-index:17;display:inline-flex;align-items:center;gap:14px;padding:14px 26px 14px 22px;border-radius:14px;background:rgba(10,18,21,.78);border:1px solid var(--line);backdrop-filter:blur(14px);font-size:30px;font-weight:700;white-space:nowrap;opacity:0;box-shadow:0 20px 50px rgba(0,0,0,.4)}
 .tag i{width:12px;height:12px;border-radius:50%;background:var(--mint);box-shadow:0 0 14px var(--mint);display:block}
 .tag small{font-size:20px;font-weight:600;color:var(--muted);letter-spacing:.14em;margin-right:4px}
@@ -37,7 +37,7 @@ body{font-family:var(--sans)}
 .callout{position:absolute;z-index:17;opacity:0}
 .callout .lb{font-size:34px;font-weight:800;white-space:nowrap;padding-left:22px;border-left:3px solid var(--mint)}
 .callout .lb small{display:block;font-size:20px;font-weight:600;color:var(--muted);letter-spacing:.18em;margin-bottom:6px}
-.card{position:absolute!important;z-index:17;opacity:0;background:rgba(10,18,21,.84)!important;padding:34px 44px}   /* ⚠ .glass 會設 position:relative，所以這裡強制 absolute */
+.card{position:absolute!important;z-index:17;opacity:0;background:rgba(10,18,21,.84)!important;padding:34px 44px}   /* ⚠ .glass sets position:relative, so force absolute here */
 .card .eb{font-size:20px;letter-spacing:.3em;color:var(--champ);font-weight:700}
 .card .eq{font-size:52px;font-weight:800;margin-top:14px;white-space:nowrap}
 .card .eq span{color:#b9cbcf;font-weight:600;margin:0 14px}
@@ -46,28 +46,28 @@ body{font-family:var(--sans)}
 #flash{position:absolute;inset:0;background:radial-gradient(circle at 50% 50%,rgba(135,221,187,.35),transparent 60%);opacity:0;z-index:19;pointer-events:none}
 #dimAll{position:absolute;inset:0;background:rgba(8,13,16,.72);backdrop-filter:blur(10px);opacity:0;z-index:16}
 
-/* ═══ 4. 本片版面（依分鏡修改） ═══ */
-/* S1 鉤子 */
+/* ═══ 4. This film's layout (edit per storyboard) ═══ */
+/* S1 hook */
 #hookCard{left:500px;top:300px;width:920px}
 #hookCard .big{font-size:140px;font-weight:800;letter-spacing:-.03em;line-height:1;margin-top:18px}
 #q1{left:150px;top:210px} #q2{left:1450px;top:420px} #q3{left:330px;top:730px}
-#pain{left:0;width:1920px;top:430px;text-align:center;font-size:150px;opacity:0}
-/* S2 登場 */
+#pain{left:0;width:1920px;top:430px;text-align:center;font-size:140px;opacity:0}
+/* S2 reveal */
 #heroShade{background:linear-gradient(90deg,rgba(8,13,16,.88) 0%,rgba(8,13,16,.55) 38%,rgba(8,13,16,0) 70%)}
 #titleShade{background:radial-gradient(ellipse 60% 55% at 50% 50%,rgba(8,13,16,.82),rgba(8,13,16,.55));opacity:0}
-#k1{left:110px;top:360px;font-size:108px}
+#k1{left:110px;top:360px;font-size:100px}
 #title{position:absolute;left:0;width:1920px;top:330px;text-align:center;z-index:17}
 #title .eb{font-size:26px;letter-spacing:.42em;color:var(--mint);font-weight:700;opacity:0}
 #title .t{font-size:150px;font-weight:800;margin-top:22px;opacity:0}
 #title .s{font-size:30px;letter-spacing:.32em;color:var(--champ);margin-top:22px;font-weight:600;opacity:0}
-/* S3 功能：放大 + 標註 */
+/* S3 feature: push-in + callouts */
 #coShade{position:absolute;left:0;top:0;width:1300px;height:1080px;background:linear-gradient(90deg,rgba(8,13,16,.85),rgba(8,13,16,.5) 70%,transparent);opacity:0;z-index:16}
 #co1{left:800px;top:380px} #co2{left:800px;top:520px} #co3{left:800px;top:660px}
 #formula{left:110px;top:640px}
-/* S4 情境 + 大字 */
-#k2{left:0;width:1920px;top:360px;text-align:center;font-size:170px}
-/* S5 收尾 */
-#k3{left:0;width:1920px;top:370px;text-align:center;font-size:160px}
+/* S4 scenario + big words */
+#k2{left:0;width:1920px;top:360px;text-align:center;font-size:140px}
+/* S5 close */
+#k3{left:0;width:1920px;top:370px;text-align:center;font-size:140px}
 #logo{position:absolute;left:0;width:1920px;top:300px;text-align:center;z-index:17}
 #logo .name{font-size:140px;font-weight:800;letter-spacing:-.02em;opacity:0}
 #logo .cn{font-size:34px;color:var(--champ);letter-spacing:.3em;margin-top:26px;font-weight:600;opacity:0}
@@ -79,69 +79,69 @@ body{font-family:var(--sans)}
 <div id="stage">
   <div id="grid"></div>
 
-  <!-- 素材層：DOM 越後面越上層。data-n = 該鏡頭總格數（看 assets/clips/<名稱>/ 有幾張） -->
+  <!-- Footage: later in DOM = on top. data-n = frame count of assets/clips/<name>/ -->
   <div id="c_hero" class="clip"><img data-clip="hero" data-n="255" src="assets/clips/hero/0000.jpg"><div id="heroShade" class="shade"></div><div id="titleShade" class="shade"></div></div>
   <div id="c_feature" class="clip"><img data-clip="feature" data-n="240" src="assets/clips/feature/0000.jpg"></div>
   <div id="c_layer" class="clip"><img data-clip="layer" data-n="255" src="assets/clips/layer/0000.jpg"><div class="shade" style="background:linear-gradient(90deg,rgba(8,13,16,.6),transparent 55%)"></div></div>
   <div id="c_scenario" class="clip"><img data-clip="scenario" data-n="240" src="assets/clips/scenario/0000.jpg"></div>
 
   <div id="topfade"></div><div id="botfade"></div>
-  <div id="demoTag"><i></i>展示畫面 · 模擬資料</div>
+  <div id="demoTag"><i></i>DEMO · SIMULATED DATA</div>
   <div id="coShade"></div>
 
-  <!-- S1 鉤子 -->
-  <div id="hookCard" class="card glass"><div class="eb">PAIN POINT · 痛點</div><div class="big num" id="hookNum">0</div><div class="foot" style="color:var(--muted)">只有一個數字</div></div>
-  <div id="q1" class="tag"><i></i>問題一？</div>
-  <div id="q2" class="tag amber"><i></i>問題二？</div>
-  <div id="q3" class="tag blue"><i></i>問題三？</div>
-  <div id="pain" class="kin coralc">看不見，</div>
+  <!-- S1 hook -->
+  <div id="hookCard" class="card glass"><div class="eb">PAIN POINT</div><div class="big num" id="hookNum">0</div><div class="foot" style="color:var(--muted)">just one number</div></div>
+  <div id="q1" class="tag"><i></i>Question one?</div>
+  <div id="q2" class="tag amber"><i></i>Question two?</div>
+  <div id="q3" class="tag blue"><i></i>Question three?</div>
+  <div id="pain" class="kin coralc">Invisible.</div>
 
-  <!-- S2 登場 -->
-  <div id="k1" class="kin"><span class="w">一句話，</span><span class="w mint">講產品價值。</span></div>
-  <div id="title"><div class="eb">LAB PRESENTS</div><div class="t">產品<span class="mint">名稱</span></div><div class="s">ENGLISH TAGLINE</div></div>
+  <!-- S2 reveal -->
+  <div id="k1" class="kin"><span class="w">One line of</span><span class="w mint">product value.</span></div>
+  <div id="title"><div class="eb">LAB PRESENTS</div><div class="t">Product <span class="mint">Name</span></div><div class="s">ENGLISH TAGLINE</div></div>
 
-  <!-- S3 功能 -->
-  <div id="co1" class="callout"><div class="lb"><small>METRIC 1</small>指標一</div></div>
-  <div id="co2" class="callout"><div class="lb"><small>METRIC 2</small>指標二</div></div>
-  <div id="co3" class="callout"><div class="lb"><small>METRIC 3</small>指標三</div></div>
-  <div id="tagLayer" class="tag blue" style="left:72px;top:170px"><i></i><small>LAYER</small>圖層名稱</div>
-  <div id="formula" class="card glass"><div class="eb">HOW IT WORKS</div><div class="eq">輸入<span>×</span>係數<span>＝</span><b class="mint">結果</b></div><div class="foot">＊示範係數，僅供情境展示</div></div>
+  <!-- S3 feature -->
+  <div id="co1" class="callout"><div class="lb"><small>METRIC 1</small>Metric one</div></div>
+  <div id="co2" class="callout"><div class="lb"><small>METRIC 2</small>Metric two</div></div>
+  <div id="co3" class="callout"><div class="lb"><small>METRIC 3</small>Metric three</div></div>
+  <div id="tagLayer" class="tag blue" style="left:72px;top:170px"><i></i><small>LAYER</small>Layer name</div>
+  <div id="formula" class="card glass"><div class="eb">HOW IT WORKS</div><div class="eq">Input<span>×</span>Factor<span>=</span><b class="mint">Result</b></div><div class="foot">*Example factor, illustration only</div></div>
 
-  <!-- S4 情境 -->
-  <div id="tagScn" class="tag coral" style="left:72px;top:170px"><i></i><small>SCENARIO</small>情境名稱</div>
+  <!-- S4 scenario -->
+  <div id="tagScn" class="tag coral" style="left:72px;top:170px"><i></i><small>SCENARIO</small>Scenario name</div>
   <div id="dimAll"></div>
-  <div id="k2" class="kin"><span class="w">先模擬，</span><span class="w mint">再決策。</span></div>
+  <div id="k2" class="kin"><span class="w">Simulate first,</span><span class="w mint">then decide.</span></div>
 
-  <!-- S5 收尾 -->
-  <div id="k3" class="kin"><span class="w">記憶點，</span><span class="w mint">一句話。</span></div>
-  <div id="logo"><div class="name">YOUR Lab</div><div class="cn">中文單位名稱</div><div class="line"></div><div class="tl">一句<span class="mint">行動呼籲</span>。</div><div class="ft">展示畫面為模擬資料</div></div>
+  <!-- S5 close -->
+  <div id="k3" class="kin"><span class="w">Your memorable</span><span class="w mint">one-liner.</span></div>
+  <div id="logo"><div class="name">YOUR Lab</div><div class="cn">Organization full name</div><div class="line"></div><div class="tl">One clear <span class="mint">call to action</span>.</div><div class="ft">Demo footage uses simulated data</div></div>
   <div id="flash"></div>
 </div>
 <script src="_runtime/gsap.min.js"></script>
 <script src="_tl.js"></script>
 <script src="_runtime/core.js"></script>
 <script>
-const CLIPS = [];   // tick() 依時間把每個鏡頭換到正確的那一格
+const CLIPS = [];   // tick() swaps each shot to the right frame
 window.EPISODE = {
-  strings: { zh: {} },
+  strings: { zh: {}, en: {} },
   build(c) {
     const { m, S, L, LE, LM } = c;
     const E = "expo.out", IO = "expo.inOut";
-    /* ── 小工具（照抄即可） ── */
+    /* ── helpers (copy as is) ── */
     const fadeIn = (sel, t, d = .7) => m.fromTo(sel, { opacity: 0 }, { opacity: 1, duration: d, ease: "power2.out" }, t);
     const fadeOut = (sel, t, d = .5) => m.to(sel, { opacity: 0, duration: d, ease: "power2.in" }, t);
     const pop = (sel, t) => m.fromTo(sel, { opacity: 0, y: 24, scale: .94 }, { opacity: 1, y: 0, scale: 1, duration: .7, ease: "back.out(1.6)" }, t);
     const words = (sel, t, gap = .4) => m.fromTo(sel + " .w", { opacity: 0, y: 70, filter: "blur(16px)" }, { opacity: 1, y: 0, filter: "blur(0px)", duration: 1, ease: E, stagger: gap }, t);
-    // clip(選擇器, 開始秒, 結束秒, 從第幾格開始)：t0 時播第 skip 格，之後每秒 30 格；超過總格數就停在最後一格；t1+0.6 秒自動隱藏
+    // clip(selector, t0, t1, skip): frame `skip` at t0, then 30 fps; holds last frame; auto-hides at t1+0.6
     const clip = (sel, t0, t1, skip = 0) => { const el = c.$(sel); const img = el.tagName === "IMG" ? el : el.querySelector("img"); CLIPS.push({ img, t0, t1, skip, n: +img.dataset.n }); if (el.classList.contains("clip")) m.set(el, { opacity: 0 }, t1 + .6); };
-    // cutIn：由右往左擦入（轉場）
+    // cutIn: right-to-left wipe (transition)
     const cutIn = (sel, t, d = .8) => m.fromTo(sel, { opacity: 0, clipPath: "inset(0 0 0 100%)" }, { opacity: 1, clipPath: "inset(0 0 0 0%)", duration: d, ease: IO }, t);
-    // zoomTo：以畫面上某一點為中心放大（推鏡到某個面板）
+    // zoomTo: scale around a point (push into a panel)
     const zoomTo = (sel, x, y, scale, t, d = 1.4) => { m.set(sel + " img", { transformOrigin: `${x}px ${y}px` }, t - .01); m.fromTo(sel + " img", { scale: 1 }, { scale, duration: d, ease: IO }, t); };
-    // drift：整段緩慢推近（Ken Burns），讓靜態鏡頭也有生命
+    // drift: slow Ken Burns push for life in static shots
     const drift = (sel, t, d, s0 = 1.05, s1 = 1.18) => m.fromTo(sel + " img", { scale: s0 }, { scale: s1, duration: d, ease: "none" }, t);
 
-    /* ── S1 鉤子：痛點數字 + 三個問題 + 一句反差 ── */
+    /* ── S1 hook: pain number + three questions + contrast ── */
     fadeIn("#grid", .2, 1.5);
     c.rise("#hookCard", L(0, 0) + .1, 1.1);
     c.count("#hookNum", 0, 1284600, L(0, 0) + .4, 2.2, v => Math.round(v).toLocaleString("en-US"));
@@ -150,12 +150,12 @@ window.EPISODE = {
     c.rise("#pain", L(0, 2) + .25, 1);
     c.out(["#hookCard", "#q1", "#q2", "#q3", "#pain", "#grid"], S(1).start - .45, .5);
 
-    /* ── S2 登場：圓形展開 3D 主視覺 → 大字 → 片名 ── */
+    /* ── S2 reveal: circle-reveal 3D hero → big words → title ── */
     const s1 = S(1).start;
     clip("#c_hero", s1 - .2, S(2).start + 1);
     m.fromTo("#c_hero", { opacity: 1, clipPath: "circle(0% at 66% 50%)" }, { clipPath: "circle(120% at 66% 50%)", duration: 1.6, ease: IO }, s1 + .1);
     m.fromTo("#c_hero img", { scale: 1.32 }, { scale: 1.12, duration: S(2).start - s1 + 1, ease: "power1.out" }, s1);
-    m.fromTo("#c_hero img", { x: 330 }, { x: 0, duration: 1.4, ease: IO }, L(1, 1) - .4);     // 文字在左時把主體推到右邊
+    m.fromTo("#c_hero img", { x: 330 }, { x: 0, duration: 1.4, ease: IO }, L(1, 1) - .4);     // push subject right while text is on the left
     words("#k1", L(1, 0) + .2, .45);
     fadeIn(["#topfade", "#botfade", "#demoTag"], s1 + .6, .6);
     c.out("#k1", L(1, 1) - .3, .5);
@@ -165,12 +165,12 @@ window.EPISODE = {
     fadeIn("#flash", L(1, 1) + .25, .2); fadeOut("#flash", L(1, 1) + .45, 1);
     c.out("#title", S(2).start - .4, .5);
 
-    /* ── S3 功能：UI 鏡頭推近面板 + 三個標註；接 3D 圖層鏡頭 + 公式卡 ── */
+    /* ── S3 feature: UI push-in + callouts; then 3D layer shot + formula card ── */
     const s2 = S(2).start;
     fadeOut("#c_hero", s2, .6);
     clip("#c_feature", s2 - .4, L(2, 1) + .3);
     cutIn("#c_feature", s2 - .35, .8);
-    zoomTo("#c_feature", 1870, 470, 1.85, s2 + .7, 1.6);                 // ← 點到的面板位置（看截圖量）
+    zoomTo("#c_feature", 1870, 470, 1.85, s2 + .7, 1.6);                 // ← panel position (measure on a capture)
     fadeIn("#coShade", LM(2, 0, .3), .6);
     ["#co1", "#co2", "#co3"].forEach((s, k) => m.fromTo(s, { opacity: 0, x: -40 }, { opacity: 1, x: 0, duration: .6, ease: E }, LM(2, 0, .35 + k * .18)));
     c.out(["#co1", "#co2", "#co3"], L(2, 1) - .35, .4); fadeOut("#coShade", L(2, 1) - .35, .4);
@@ -181,9 +181,9 @@ window.EPISODE = {
     c.rise("#formula", LM(2, 1, .3), 1);
     c.out(["#tagLayer", "#formula"], S(3).start - .35, .4);
 
-    /* ── S4 情境：按鈕在第 30 格被按下 → 讓「按下」剛好落在問句講完時 ── */
+    /* ── S4 scenario: button pressed at frame 30 → land the press right after the question ── */
     const s3 = S(3).start;
-    clip("#c_scenario", Math.min(LM(3, 0, .22) - 1.0, s3 - .3), L(3, 1) + .8);   // 1.0 = 30 格 / 30fps
+    clip("#c_scenario", Math.min(LM(3, 0, .22) - 1.0, s3 - .3), L(3, 1) + .8);   // 1.0 = 30 frames / 30 fps
     cutIn("#c_scenario", s3 - .3, .8);
     zoomTo("#c_scenario", 1100, 150, 1.55, s3 + .2);
     pop("#tagScn", s3 + .1); c.out("#tagScn", L(3, 1) - .2, .4);
@@ -191,7 +191,7 @@ window.EPISODE = {
     words("#k2", L(3, 1) + .2, .5);
     c.out("#k2", S(4).start - .45, .5); fadeOut(["#dimAll", "#topfade", "#botfade", "#demoTag"], S(4).start - .3, .5);
 
-    /* ── S5 收尾：記憶點大字 → Logo ── */
+    /* ── S5 close: memorable line → logo ── */
     const s4 = S(4).start;
     fadeIn("#grid", s4 - .2, 1);
     words("#k3", L(4, 0) - .05, .5);
@@ -215,7 +215,7 @@ window.EPISODE = {
 </script>
 <script src="_runtime/runtime.js"></script>
 <script>
-/* 渲染時等新的一格圖片解碼完再截圖（不然會截到上一格）。不要刪。 */
+/* Wait for each new frame to decode before the render screenshot (else stale frames). Do not remove. */
 (() => {
   const base = window.__seek;
   window.__seek = (t) => {

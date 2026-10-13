@@ -1,222 +1,190 @@
 ---
 name: product-promo-video
-description: 把一個可以在瀏覽器打開的產品（網站、儀表板、3D 數位孿生、SaaS 系統）實際操作錄下來，剪成「行銷公司等級」的橫式產品介紹影片：行銷腳本、真實操作畫面、推鏡與標註、台灣口音配音、配樂與音效，一次輸出 MP4。當使用者說「幫我的系統／網站／專題做介紹影片」「做產品宣傳片」「給企業客戶看的 demo 影片」「錄操作畫面做成影片」時使用。需要搭配 motion-video-skill。
+description: Turn any product that runs in a browser (website, dashboard, 3D digital twin, SaaS) into an agency-grade landscape promo video — marketing script, real product footage captured frame by frame, push-ins and callouts, AI voice-over, music and sound design — rendered to MP4. Use when the user asks for a product video, demo video, promo for clients, or "record my system and make it a video". Requires motion-video-skill.
 ---
 
-# Product Promo Video Skill — 把網頁產品做成專業介紹影片
+# Product Promo Video Skill — turn a web product into a professional promo
 
-這個 skill 是 [motion-video-skill](https://github.com/nutcelvischen-jpg/motion-video-skill) 的延伸：
-motion-video 負責「動畫＋配音＋渲染」的引擎，這個 skill 加上**產品實拍**與**行銷包裝**：
+This skill extends [motion-video-skill](https://github.com/nutcelvischen-jpg/motion-video-skill/tree/en):
+motion-video is the engine (animation + TTS + rendering); this skill adds **real product footage** and **marketing craft**.
 
-| 加了什麼 | 用什麼做 |
+| Adds | With |
 |---|---|
-| 真實操作畫面（含 3D / WebGL）逐格擷取，30fps 平順 | `scripts/capture.py` + `scripts/vt.js`（虛擬時鐘） |
-| 行銷公司的腳本結構（痛點→登場→功能→情境→價值→署名） | `references/storyboard-marketing.md` |
-| 畫面放大推鏡、標註、轉場、Logo 片尾 | `templates/promo-wide/index.html` |
-| 配音加速＋句子精準對齊停頓 | `scripts/align_timeline.py` |
-| 配樂（Apple Loops 編排）、轉場音效（程式合成）、專業混音 | `scripts/music.py`、`sfx.py`、`mix.py` |
-| 檢查用總覽圖 | `scripts/contact_sheet.py` |
+| Real UI / 3D / WebGL footage, captured frame by frame at a smooth 30 fps | `scripts/capture.py` + `scripts/vt.js` (virtual clock) |
+| Agency script structure (pain → reveal → features → scenarios → value → sign-off) | `references/storyboard-marketing.md` |
+| Push-ins, callouts, transitions, logo end card | `templates/promo-wide/index.html` |
+| Voice-over speed-up + sentence alignment to real pauses | `scripts/align_timeline.py` |
+| Music from loops, synthesized SFX, broadcast-style mix | `scripts/music.py`, `sfx.py`, `mix.py` |
+| Contact sheets for review | `scripts/contact_sheet.py` |
 
-完整範例：`examples/cnc-twin/`（CNC 工廠數位孿生，90 秒，企業客戶，片尾 ICMA Lab）。
+Full example: `examples/cnc-twin/` (CNC factory digital twin, 90 s, enterprise audience, signed ICMA Lab).
 
-`<P>` = 本 skill 資料夾，`<MV>` = motion-video skill 資料夾。所有指令在**工作區根目錄**執行，影片放 `videos/<名稱>/`。
-
----
-
-## 總流程（照順序做，每一步都有檢查點）
-
-```
-0 環境 → 1 試用產品 → 2 腳本（給使用者確認）→ 3 建資料夾 → 4 鏡頭清單 + 試拍 → 5 正式擷取
-→ 6 配音 + 對齊 → 7 動畫 → 8 總覽圖檢查 → 9 配樂音效 → 10 渲染 + 混音 → 11 成片檢查 → 12 交付
-```
-
-時間預估（90 秒影片）：腳本 15 分、擷取 20～60 分（看電腦，可背景跑）、動畫 30～60 分、渲染 10～15 分。
+`<P>` = this skill folder, `<MV>` = motion-video skill folder. Run everything from the **workspace root**; videos live in `videos/<name>/`.
 
 ---
 
-## 步驟 0：環境
+## Pipeline (in order — each step has a checkpoint)
+
+```
+0 setup → 1 use the product → 2 script (user approves) → 3 scaffold → 4 shot list + test capture → 5 capture
+→ 6 voice + align → 7 animate → 8 contact-sheet review → 9 music + SFX → 10 render + mix → 11 final review → 12 deliver
+```
+
+Rough time for 90 s: script 15 min, capture 20–60 min (background), animation 30–60 min, render 10–15 min.
+
+---
+
+## Step 0: Setup
 
 ```bash
-git clone https://github.com/nutcelvischen-jpg/motion-video-skill .agents/skills/motion-video   # 若還沒裝
+git clone -b en https://github.com/nutcelvischen-jpg/motion-video-skill .agents/skills/motion-video
 pip install playwright numpy pillow imageio-ffmpeg && python -m playwright install chromium
 python <MV>/scripts/check_env.py
-ffmpeg -version     # mix.py / align_timeline.py 需要系統 ffmpeg
+ffmpeg -version     # mix.py / align_timeline.py need system ffmpeg
 ```
-- TTS 金鑰用環境變數 `OPENROUTER_API_KEY`（或 `GEMINI_API_KEY`），**絕不寫進檔案或對話**。
-  使用者沒設定時，請他存在家目錄的隱藏檔（例：`~/.openrouter.env`，`chmod 600`），執行時 `set -a; source ~/.openrouter.env; set +a`。
-- Mac 的 Homebrew Python 若出現 `CERTIFICATE_VERIFY_FAILED`：`export SSL_CERT_FILE=/etc/ssl/cert.pem`。
-- 雲端／沙盒環境常常連不到 TTS API 或 Google Fonts：TTS 改在使用者電腦上跑，字型改用本機字型（範本已內建 Manrope + Noto Sans CJK TC 備援）。
+- TTS key via env var `OPENROUTER_API_KEY` (or `GEMINI_API_KEY`). **Never write it into files or the chat.** Ask the user to store it in a hidden file (`~/.openrouter.env`, `chmod 600`) and load with `set -a; source ~/.openrouter.env; set +a`.
+- Homebrew Python on macOS showing `CERTIFICATE_VERIFY_FAILED`: `export SSL_CERT_FILE=/etc/ssl/cert.pem`.
+- Cloud sandboxes often cannot reach the TTS API or Google Fonts: run TTS on the user's machine; use local fonts (the template ships Manrope + Noto Sans CJK fallback).
 
-## 步驟 1：先當使用者，把產品玩一遍（不可省略）
+## Step 1: Use the product first (never skip)
 
-目的：知道有哪些「值得拍」的畫面、哪些功能在影片裡會看不清楚。
+Goal: know what is worth filming and what will be unreadable on video.
 
-1. 讀產品的 `README.md` / `PRODUCT.md` / `DESIGN.md`：功能、色票、字型、資料是真是假。
-2. 啟動產品：靜態網站 `cd dist && python -m http.server 8766`；Vite 專案 `npm run build` 後同上（或 `npm run dev`）。
-3. 用 Playwright 開起來，**列出所有按鈕文字**（之後鏡頭清單要用）：
-   ```python
-   btns = await pg.eval_on_selector_all("button", "els=>els.map(e=>(e.innerText||e.getAttribute('aria-label')||'').trim())")
-   ```
-4. 每個主要功能點一次、截一張圖，拼成總覽圖親自看。特別注意：
-   - **在小畫面看不出差異的功能**（例如圖層只變一點點顏色）→ 影片要推鏡放大，或建議使用者先改程式加強對比。
-   - **鏡頭預設差異太小** → 改用滑鼠拖曳做環繞運鏡（capture.py 的 `drag`）。
-   - **3D 畫布的父容器選擇器**（例如 `.scene-area` / `#scene`）→ 之後做全螢幕「電影鏡頭」用。
-   - 有沒有 toast、彈窗、需要登入、localStorage 會記住上次狀態。
-5. 回報使用者：哪些能直接拍、哪些建議先改程式（列成「建議改／可改可不改／不用改」三類，附理由與改法）。**使用者改完再拍**，不然要重拍。
+1. Read the product's `README.md` / `PRODUCT.md` / `DESIGN.md`: features, palette, fonts, real vs. simulated data.
+2. Serve it: static `cd dist && python -m http.server 8766`; Vite: `npm run build` then the same (or `npm run dev`).
+3. Open it with Playwright and **list every button label** (you'll need them for the shot list).
+4. Click through each main feature, screenshot, stitch a contact sheet and look at it. Watch for:
+   - **Features whose change is barely visible** (e.g. a layer that only tints slightly) → push in on video, or suggest a code change for more contrast.
+   - **Camera presets that barely differ** → use mouse-drag orbits (`drag` in capture.py).
+   - **The selector of the 3D canvas container** (e.g. `.scene-area` / `#scene`) → needed for full-screen "cine" shots.
+   - Toasts, modals, logins, state persisted in localStorage.
+5. Report to the user in three buckets — *recommended changes / optional / no change needed* — with reasons. **Film after they change the code**, or you'll re-shoot.
 
-## 步驟 2：寫行銷腳本（先給使用者確認台詞再往下）
+## Step 2: Marketing script (user approves lines before moving on)
 
-先讀 `references/storyboard-marketing.md`。問清楚（沒說就用預設）：
+Read `references/storyboard-marketing.md`. Defaults if not specified:
 
-| 項目 | 預設 |
+| Item | Default |
 |---|---|
-| 長度 | 90 秒（約 330～360 個中文字）|
-| 觀眾 | 企業客戶（決策者）|
-| 語言 | 台灣華語（`zh`）|
-| 聲音 | `Leda`＋「科技發表會旁白：沉穩、專業、有自信」|
-| 片尾署名 | 使用者的實驗室／公司 |
+| Length | 90 s (≈ 210–230 English words / 330–360 Chinese characters) |
+| Audience | Enterprise decision makers |
+| Voice | `Charon`/`Aoede` (en) or `Leda` (Taiwanese Mandarin) + "keynote narrator: calm, professional, confident" |
+| Sign-off | The user's lab / company |
 
-標準 8 場結構：**痛點鉤子 → 產品登場 → 核心功能 → 原理／圖層 → 情境模擬 → 量化價值 → 擴充與未來 → 記憶點＋署名**。
+Standard 8-scene structure: **pain hook → product reveal → core feature → how it works / layers → scenario simulation → quantified value → scale & roadmap → tagline + sign-off**.
 
-規則：
-- 每句 8～24 字；數字與英文縮寫用 `["念法", "顯示"]`（例：`["C N C", "CNC"]`、`["3 D", "3D"]`、`["I o T", "IoT"]`）。
-- 中文一律台灣用語（影片、資料、軟體、品質；不用視頻、數據、軟件、質量、家人們）。
-- **誠實**：模擬資料要標「展示畫面・模擬資料」；示範係數要註明；未來功能用「下一步」，不能講成已上線；不捏造客戶、成效數字。開場若用戲劇化數字（帳單金額），交付時要提醒使用者。
-- 每句台詞旁邊寫好「這句配什麼畫面」，畫面要能從產品實際拍到。
+Rules:
+- One idea per line; for TTS pronunciation use `["spoken", "displayed"]` (e.g. `["C N C", "CNC"]`, `["three D", "3D"]`).
+- **Honesty**: label simulated data on screen; footnote example coefficients; future features only as "next"; never invent customers or results. If the hook uses a dramatized number, tell the user at delivery.
+- Next to each line, note which shot covers it — and the shot must be capturable from the real product.
 
-## 步驟 3：建資料夾
+## Step 3: Scaffold
 
 ```bash
-python <P>/scripts/new_promo.py videos/<名稱> --mv <MV>
+python <P>/scripts/new_promo.py videos/<name> --mv <MV>
 ```
-然後：把確認過的台詞寫進 `script.json`；`index.html` 的 `:root` 換成產品色票（看產品 CSS 變數或 DESIGN.md）、`assets/fonts/` 換成產品字型。
+Put the approved lines in `script.json`; set `:root` colors in `index.html` to the product palette; put the product font in `assets/fonts/`.
 
-## 步驟 4：鏡頭清單 + 試拍
+## Step 4: Shot list + test capture
 
-先讀 `references/capture-guide.md`。編輯 `shots.json`，每個鏡頭一個條目：
+Read `references/capture-guide.md`. Edit `shots.json`:
 
-- `mode: "cine"`：只留 3D 畫布、全螢幕（產品登場、圖層、電影感環繞）。
-- `mode: "ui"`：整個介面（點按鈕、看數字跳動、表單操作），之後在動畫裡推鏡到重點區域。
-- 動作在第幾格發生（30 格 = 1 秒）：`click`（按鈕文字）、`drag`（環繞）、`type`（逐字輸入）、`fill`、`select`、`eval`。
-- 每個鏡頭 240～270 格（8～9 秒），比該句台詞長一點；**關鍵動作放在第 20～30 格**，方便動畫對時。
+- `mode: "cine"` — 3D canvas only, full screen (reveal, layers, cinematic orbits).
+- `mode: "ui"` — the whole interface (clicks, numbers changing, forms); push in later in the animation.
+- Actions at frame N (30 frames = 1 s): `click` (button text), `drag` (orbit), `type` (typing), `fill`, `select`, `eval`.
+- 240–270 frames per shot; **put the key action at frame 20–30** so it is easy to sync.
 
-試拍（每 45 格存一張，快速檢查動作有沒有發生）：
 ```bash
-python <P>/scripts/capture.py videos/<名稱>/shots.json --out /tmp/test_clips --test
-python <P>/scripts/contact_sheet.py clips /tmp/test_clips      # 打開 sheet_clips.jpg 看
+python <P>/scripts/capture.py videos/<name>/shots.json --out /tmp/test_clips --test
+python <P>/scripts/contact_sheet.py clips /tmp/test_clips      # open sheet_clips.jpg
 ```
-確認：按鈕真的按到（log 出現「找不到按鈕文字」就是沒按到）、環繞角度不會轉到產品背面、彈窗/toast 正常。
+Check the clicks happened (log prints "找不到按鈕文字" = button not found), orbits don't swing behind the model, toasts/modals behave.
 
-## 步驟 5：正式擷取（可背景執行）
+## Step 5: Capture (background)
 
 ```bash
-nohup python <P>/scripts/capture.py videos/<名稱>/shots.json --out videos/<名稱>/assets/clips --jobs 2 > capture.log 2>&1 &
+nohup python <P>/scripts/capture.py videos/<name>/shots.json --out videos/<name>/assets/clips --jobs 2 > capture.log 2>&1 &
 ```
-- 沒有 GPU 的雲端：3D 全螢幕約 1～2.5 秒／格、UI 約 1 秒／格。10 個鏡頭約 30～60 分鐘。**趁擷取時做步驟 6、7。**
-- Mac 有 GPU：在 shots.json 加 `"channel": "chrome", "gpu": true`，快 5～10 倍。
-- 完成後一定跑 `contact_sheet.py clips` 看每個鏡頭的頭、中、尾。
+- No GPU: 1–2.5 s/frame for full-screen 3D, ~1 s/frame for UI → 30–60 min. **Do steps 6–7 meanwhile.**
+- Mac with GPU: add `"channel": "chrome", "gpu": true` → 5–10× faster.
+- Always review with `contact_sheet.py clips`.
 
-## 步驟 6：配音 + 對齊
+## Step 6: Voice-over + alignment
 
 ```bash
-python <MV>/scripts/tts.py videos/<名稱> --lang zh --only s01   # 先試一段聽口音
-python <MV>/scripts/tts.py videos/<名稱> --lang zh               # 全部
-python <P>/scripts/align_timeline.py videos/<名稱> --mv <MV> --target 90   # 壓到目標長度並對齊句子
-python <MV>/scripts/render.py videos/<名稱> --preview            # 更新 _tl.js
+python <MV>/scripts/tts.py videos/<name> --lang en --only s01   # audition one scene
+python <MV>/scripts/tts.py videos/<name> --lang en
+python <P>/scripts/align_timeline.py videos/<name> --mv <MV> --lang en --target 90
+python <MV>/scripts/render.py videos/<name> --preview
 ```
-- TTS 通常比估計長 5～10%。`--target` 會自動算加速倍率（建議 0.95～1.08；超過 1.12 就該刪台詞）。
-- align 會把句子邊界吸附到真正的停頓，畫面切換才會精準。log 出現「找不到停頓」的句子，檢查台詞是否太長或標點太少。
-- 改了某一場台詞：`tts.py --only s03` 重做 → `align_timeline.py ... --refresh s03`（把新檔收進 raw 再重新對齊）。
+- TTS usually runs 5–10% long; `--target` computes the speed-up (0.95–1.08 is inaudible; above 1.12 cut lines instead).
+- Sentence boundaries snap to real pauses so cuts land precisely.
+- After re-doing one scene: `tts.py --only s03` then `align_timeline.py ... --refresh s03`.
 
-## 步驟 7：做動畫（改 index.html）
+## Step 7: Animate (index.html)
 
-先讀 `references/motion-recipes.md`，再看 `examples/cnc-twin/index.html`。核心概念：
+Read `references/motion-recipes.md`, then `examples/cnc-twin/index.html`.
 
-- 每個鏡頭是一個 `.clip`，`clip(sel, t0, t1, skip)` 宣告「t0 秒開始播第 skip 格」；`tick()` 每格換圖。
-- **所有時間綁台詞**：`S(i).start`、`L(i,j)`、`LM(i,j,k)`，不要寫死秒數。
-- 動作對時：鏡頭在第 30 格按下按鈕 → `clip(sel, LM(i,j,.22) - 1.0, ...)` 讓「按下」落在問句講完的瞬間。
-- 轉場：`cutIn`（擦入）；推鏡：`zoomTo(sel, x, y, scale, t)`（x,y 用截圖量面板位置）；慢推：`drift`。
-- 文字：痛點卡＋數字跳動、問題膠囊 `.tag`、大字 `.kin .w`（逐行模糊浮現）、標註 `.callout`、公式卡 `.card`、Logo。
-- 畫面上同時最多 3 個重點；字幕區（下方 160px）不放東西；長時間顯示產品畫面時保持「展示畫面・模擬資料」標籤。
+- Each shot is a `.clip`; `clip(sel, t0, t1, skip)` = "show frame `skip` at t0"; `tick()` swaps frames.
+- **Tie every time to the narration**: `S(i).start`, `L(i,j)`, `LM(i,j,k)` — never hard-code seconds.
+- Sync rule: action at frame F, should land at time T → `clip(sel, T - F/30, ...)`.
+- Transitions `cutIn`; push-ins `zoomTo(sel, x, y, scale, t)`; slow drift `drift`.
+- Max 3 focal elements at once; keep the bottom 160 px for subtitles; keep the "demo · simulated data" tag while product footage is on screen.
 
-## 步驟 8：總覽圖檢查（每次改完都做，直到沒問題）
+## Step 8: Contact-sheet review (repeat until clean)
 
 ```bash
-python <MV>/scripts/render.py videos/<名稱> --sheet          # 每句結尾一張
-python <MV>/scripts/render.py videos/<名稱> --stills 41.5,68  # 指定秒數
+python <MV>/scripts/render.py videos/<name> --sheet
+python <MV>/scripts/render.py videos/<name> --stills 41.5,68
 ```
-**一定要打開圖親自看**，對照 `references/qa-checklist.md`。最常見的錯：上一個鏡頭沒隱藏蓋住後面、卡片跑出畫面（`.glass` 的 position 衝突）、文字壓到 3D 主體、字幕被擋。
+**Open and look.** Use `references/qa-checklist.md`. Usual bugs: a previous clip not hidden, cards pushed off-screen (`.glass` position conflict), text over the 3D subject, subtitles covered.
 
-## 步驟 9：配樂與音效
+## Step 9: Music + SFX
 
-先讀 `references/audio-guide.md`。
+Read `references/audio-guide.md`.
 ```bash
-# Mac：從 GarageBand 內建 Apple Loops 選同一家族（同 BPM 同調）
-python <P>/scripts/apple_loops.py list --genre Chillwave
+python <P>/scripts/apple_loops.py list --genre Chillwave          # macOS only
 python <P>/scripts/apple_loops.py beats --bars-of 9.6
-python <P>/scripts/apple_loops.py convert "07 Chillwave/Forward Progress Synth" "07 Chillwave/Forward Progress Bass" "07 Chillwave/Matchbox Beat 01" --out videos/<名稱>/loops
-# 編排（段落綁旁白）與音效
-python <P>/scripts/music.py videos/<名稱>/music.json --timeline videos/<名稱>/timeline_zh.json --out videos/<名稱>/bgm.wav
-python <P>/scripts/sfx.py   videos/<名稱>/sfx.json   --timeline videos/<名稱>/timeline_zh.json --out videos/<名稱>/sfx.wav
+python <P>/scripts/apple_loops.py convert "07 Chillwave/Forward Progress Synth" "07 Chillwave/Forward Progress Bass" "07 Chillwave/Matchbox Beat 01" --out videos/<name>/loops
+python <P>/scripts/music.py videos/<name>/music.json --timeline videos/<name>/timeline_en.json --out videos/<name>/bgm.wav
+python <P>/scripts/sfx.py   videos/<name>/sfx.json   --timeline videos/<name>/timeline_en.json --out videos/<name>/sfx.wav
 ```
-- 音樂的關鍵：`anchor` 讓強拍落在產品登場那一刻；開場用低通濾波「悶住」、登場瞬間打開；重點句（例「先模擬，再決策」）抽掉鼓兩小節；片尾只留旋律淡出。
-- 沒有 Mac：使用者提供自己有授權的 `bgm.wav`，music.json 只放一軌。
+Key moves: `anchor` puts a downbeat on the reveal; low-pass the intro and open it at the reveal; drop the drums for two bars under the key line; strip down for the outro.
 
-## 步驟 10：渲染 + 混音
+## Step 10: Render + mix
 
 ```bash
-python <MV>/scripts/render.py videos/<名稱> --lang zh --crf 18 --workers 2
-python <P>/scripts/mix.py videos/<名稱> --lang zh --max-mb 30
+python <MV>/scripts/render.py videos/<name> --lang en --crf 18 --workers 2
+python <P>/scripts/mix.py videos/<name> --lang en --max-mb 30
 ```
-- `--crf 18`：產品畫面細節多，預設 26 會糊。90 秒約 30 MB。
-- mix.py：旁白壓縮、音樂側鏈閃避人聲、音效疊上、整體 loudnorm -15 LUFS，輸出 `out/<名稱>_zh_final.mp4`；超過 `--max-mb` 另存 `_small.mp4`。
+`--crf 18` keeps UI detail sharp (~30 MB for 90 s). mix.py: compressed voice, side-chain-ducked music, SFX, loudnorm −15 LUFS → `out/<name>_en_final.mp4` (+ `_small.mp4` if over `--max-mb`).
 
-## 步驟 11：成片檢查
+## Step 11: Final review
 
 ```bash
-python <P>/scripts/contact_sheet.py video videos/<名稱>/out/<名稱>_zh_final.mp4 --every 4
+python <P>/scripts/contact_sheet.py video videos/<name>/out/<name>_en_final.mp4 --every 4
 ```
-看：每張的字幕與畫面是否對應、轉場時沒有黑畫面、片尾 Logo 有出現、總長符合目標。
-聲音無法自動檢查：**請使用者親自聽**口音、念錯字、音樂音量。
+Every frame matches its subtitle, no black frames at cuts, logo appears, length on target. **Ask the user to listen** — accent, mispronunciations, music level.
 
-## 步驟 12：交付
+## Step 12: Deliver
 
-- 成片：`out/<名稱>_zh_final.mp4`（傳檔有大小限制就給 `_small.mp4`）。
-- 原始檔：`index.html`、`script.json`、`shots.json`、`music.json`、`sfx.json`、`timeline_zh.json`（`assets/clips/` 很大，可不附，能用 shots.json 重拍）。
-- 回報：長度、大小、響度、哪些是戲劇化／示範內容需要使用者確認、建議下一步（英文版、15 秒短版、直式版）。
+Final MP4 (or `_small.mp4`), the project sources (`index.html`, `script.json`, `shots.json`, `music.json`, `sfx.json`, timeline). `assets/clips/` is large and can be re-captured. Report length, size, loudness, anything dramatized/illustrative the user must confirm, and next options (other language, 15 s cut, vertical).
 
 ---
 
-## 常見問題
+## Top 5 problems (more in `references/troubleshooting.md`)
+1. **Screenshot hangs** — Playwright `page.clock` was used; use `vt.js` (capture.py does).
+2. **A frame shows the previous image** — the `__seek` override at the end of index.html was removed.
+3. **Card in the wrong place** — `.glass` sets `position:relative`; cards need `position:absolute!important`.
+4. **Wrong button clicked** — exact text match wins, then prefix; for duplicates use `click_sel`.
+5. **Action out of sync** — clip `t0` didn't subtract `frame / 30`.
 
-見 `references/troubleshooting.md`。最常見的五個：
-1. **截圖卡住不動**：用了 Playwright 的 `page.clock` → 改用本 skill 的 `vt.js`（capture.py 已處理）。
-2. **成片某段畫面是上一格**：`index.html` 最後那段 `__seek` 覆寫（等圖片 decode）被刪了。
-3. **卡片位置跑掉**：`.glass` 帶 `position:relative`，卡片要加 `position:absolute!important`（範本的 `.card` 已處理）。
-4. **按鈕沒按到**：文字比對是「完全相同」優先、其次「開頭相同」；同名按鈕（清單項目 vs 鏡頭按鈕）會按錯 → 改用 `click_sel`。
-5. **動作跟台詞對不上**：clip 的 t0 沒有扣掉「動作發生在第幾格 ÷ 30」。
-
-## 檔案地圖
-
+## File map
 ```
 <P>/
-├── SKILL.md                         ← 本檔
-├── scripts/
-│   ├── new_promo.py                 ← 建影片資料夾（套 promo-wide 範本）
-│   ├── capture.py + vt.js           ← 逐格擷取產品畫面
-│   ├── align_timeline.py            ← 配音加速＋句子對齊
-│   ├── music.py / apple_loops.py    ← 配樂編排 / 找 Apple Loops
-│   ├── sfx.py                       ← 程式合成音效
-│   ├── mix.py                       ← 混音＋合成成片
-│   ├── contact_sheet.py             ← 鏡頭／成片總覽圖
-│   └── ppvslib.py                   ← 共用（時間運算式、wav）
-├── templates/promo-wide/            ← index.html、script.json、shots/music/sfx.json、字型
-├── examples/cnc-twin/               ← 完整案例（90 秒企業版）
-└── references/
-    ├── storyboard-marketing.md      ← 行銷腳本結構、台詞公式、誠實原則
-    ├── capture-guide.md             ← shots.json 完整說明、鏡頭設計
-    ├── motion-recipes.md            ← 動畫招式與對時公式
-    ├── audio-guide.md               ← 配音、選曲、編排、音效、混音
-    ├── qa-checklist.md              ← 檢查清單
-    └── troubleshooting.md           ← 錯誤排除
+├── SKILL.md
+├── scripts/  new_promo.py · capture.py + vt.js · align_timeline.py · music.py · apple_loops.py · sfx.py · mix.py · contact_sheet.py · ppvslib.py
+├── templates/promo-wide/   index.html · script.json · shots/music/sfx.json · fonts
+├── examples/cnc-twin/      full 90 s enterprise example (Traditional Chinese narration)
+└── references/  storyboard-marketing · capture-guide · motion-recipes · audio-guide · qa-checklist · troubleshooting
 ```

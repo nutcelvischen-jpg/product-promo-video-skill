@@ -1,55 +1,51 @@
-# 行銷腳本：用行銷公司的方式寫產品介紹影片
+# Marketing script: write it like an agency
 
-## 1. 先決定三件事
+## 1. Decide three things first
 
-| 問題 | 為什麼重要 | 例子 |
+| Question | Why | Example |
 |---|---|---|
-| **給誰看？** | 決定語氣與要講的「好處」 | 企業客戶（老闆、廠長）→ 講成本、風險、管理；評審 → 講創新、技術；學生 → 講好玩、好學 |
-| **看完要做什麼？** | 決定片尾的行動呼籲 | 聯絡實驗室洽談導入／記住品牌／投票 |
-| **一句話價值主張** | 整支片圍繞它 | 「把整座工廠搬進瀏覽器」 |
+| **Who watches?** | Sets tone and which benefits to stress | Executives → cost, risk, control; judges → innovation; students → fun, learnable |
+| **What should they do after?** | Sets the call to action | Contact the lab / remember the brand / vote |
+| **One-line value proposition** | The whole film orbits it | "Put your entire factory in a browser." |
 
-## 2. 標準 8 場結構（90 秒）
+## 2. Standard 8 scenes (90 s)
 
-| # | 場景 | 秒數 | 目的 | 畫面公式 | 台詞公式 |
+| # | Scene | Time | Purpose | Visual formula | Line formula |
 |---|---|---|---|---|---|
-| 1 | 痛點鉤子 | 0–12 | 3 秒內讓客戶點頭「對，我就是這樣」 | 深色底＋痛點卡（數字跳動）＋ 3 個問題膠囊＋反差大字 | 「每個月，＿＿只給你一個數字。／問題一？問題二？問題三？／大多數＿＿，其實答不出來。」 |
-| 2 | 產品登場 | 12–21 | 情緒轉折，第一次看到產品 | 3D 主視覺圓形展開＋左側大字 → 置中片名＋閃光 | 「現在，把＿＿搬進＿＿。／［品牌］推出［產品名］。」 |
-| 3 | 核心功能 | 21–33 | 證明「真的能用」 | UI 鏡頭（瀏覽器框傾斜浮入）→ 3D 近景 → 點選後推鏡到細節面板＋標註 | 「每一台＿＿的＿＿、＿＿與＿＿，都即時同步。／點一下，就能看到＿＿。」 |
-| 4 | 原理／圖層 | 33–44 | 讓專業觀眾信服 | 圖層切換的電影鏡頭＋圖例膠囊 → 公式卡 | 「切換＿＿圖層，＿＿一眼看清。／＿＿先＿＿，多的再＿＿。」 |
-| 5 | 情境模擬 | 44–60 | 展現決策價值（最重要的賣點） | 兩個情境各一個 UI 鏡頭，推鏡到變化的數字 → 暗場大字 | 「＿＿？＿＿立刻＿＿。／＿＿？＿＿同步反應。／在做決策之前，先模擬，把風險留在螢幕上。」 |
-| 6 | 量化價值 | 60–68 | 連結到老闆在意的 KPI | 另一圖層鏡頭＋計算式卡 → 三張 KPI 卡片 | 「每一＿＿，都換算成＿＿。／＿＿、＿＿與＿＿，放在同一個畫面管理。」 |
-| 7 | 擴充與未來 | 68–80 | 降低導入疑慮、展示路線圖 | 新增／設定操作鏡頭 → 架構圖（資料源→閘道→產品，光點流動） | 「＿＿要擴充？＿＿自動＿＿。／下一步，串接你的＿＿，讓＿＿與真實＿＿同步。」 |
-| 8 | 記憶點＋署名 | 80–90 | 留下一句話與品牌 | 大字 → Logo＋單位名＋行動呼籲＋免責小字 | 「看得見，才管得好。／［品牌］，為你的＿＿打造＿＿。」 |
+| 1 | Pain hook | 0–12 | Viewer nods "that's us" in 3 s | Dark grid, pain card with counting number, 3 question pills, contrast word | "Every month, ___ gives you one number. / Q1? Q2? Q3? / Most ___ can't answer." |
+| 2 | Reveal | 12–21 | Emotional turn, first look | 3D hero via circle reveal + big words left → centered title + flash | "Now, put ___ in ___. / [Brand] presents [Product]." |
+| 3 | Core feature | 21–33 | Prove it works | UI in a tilted browser frame → 3D close-up → click + push-in on details + callouts | "Every ___'s ___, ___ and ___, live. / One click shows ___." |
+| 4 | How it works | 33–44 | Win the experts | Layer cine shot + legend pills → formula card | "Switch to the ___ layer and see ___. / ___ first, the rest goes to ___." |
+| 5 | Scenarios | 44–60 | Decision value (the key selling point) | Two UI shots, push into the changing numbers → dim + big words | "___? ___ responds instantly. / ___? Everything reacts. / Simulate before you decide." |
+| 6 | Quantified value | 60–68 | Tie to KPIs | Another layer shot + calculation card → three KPI cards | "Every ___ becomes ___. / ___, ___ and ___ on one screen." |
+| 7 | Scale & roadmap | 68–80 | Lower adoption risk | Add/config action shot → architecture diagram with flowing dots | "Expanding? ___ auto-arranges. / Next: connect your ___ so the twin runs with the real line." |
+| 8 | Tagline + sign-off | 80–90 | One memorable line + brand | Big words → logo, org name, CTA, disclaimer | "See it, then manage it. / [Brand] builds ___ for your ___." |
 
-- 60 秒版：刪 4、6，5 只留一個情境。30 秒版：1（一句）→ 2 → 5（一句）→ 8。
-- 第 1 場的反差大字（「看不見，」）要跟第 8 場的記憶點（「看得見，才管得好。」）**首尾呼應**。
+- 60 s: drop 4 and 6, keep one scenario. 30 s: 1 (one line) → 2 → 5 (one line) → 8.
+- Make scene 1's contrast word ("Invisible,") **pay off** in scene 8 ("See it, then manage it.").
 
-## 3. 台詞寫法
+## 3. Lines
+- One idea per line; 2–3 lines per scene. 90 s ≈ 210–230 English words.
+- Talk to "you / your factory", not "we will now introduce".
+- Use verbs the footage can *perform*: "click", "switch", "add" — then show exactly that.
+- Question + answer is the strongest rhythm for scenarios.
+- Pronunciation fixes: `["C N C machines", "CNC machines"]`, `["I o T", "IoT"]`, acronyms spelled with spaces.
 
-- 一句一個重點，8～24 字；一場 2～3 句。90 秒約 330～360 字（含停頓後實際約 4 字／秒）。
-- 用「你」「你的工廠」，少用「我們將為您介紹」。
-- 動詞要能被畫面「演出來」：「點一下」「切換」「新增」→ 畫面就要真的點、切、新增。
-- 問句＋答句是情境段落最有力的節奏：「天氣轉陰？太陽能下降，電網購電立刻補上。」
-- 念法修正：`["每一台 C N C 的狀態", "每一台 CNC 的狀態"]`、`["3 D 廠區", "3D 廠區"]`、`["I o T", "IoT"]`、品牌縮寫逐字母加空格。
-- 台灣用語：影片、資料、軟體、品質、網路、程式、螢幕、介面；避免視頻、數據、軟件、質量、網絡、程序、屏幕、界面、家人們、yyds。
+## 4. Honesty (enterprise viewers care most)
 
-## 4. 誠實原則（企業客戶最在意，也最容易出事）
-
-| 情況 | 做法 |
+| Situation | Do |
 |---|---|
-| 產品用模擬資料 | 有產品畫面時，左上角常駐「展示畫面・模擬資料」；片尾小字再寫一次 |
-| 係數、參數是示範值 | 公式卡加註「＊示範係數 ___，僅供情境展示，非正式盤查」 |
-| 功能還沒做 | 只能放在「下一步／路線圖」段落，用「下一步」「可串接」，不說「已支援」 |
-| 開場戲劇化數字（帳單金額等） | 可以用，但交付時明確提醒使用者這是虛構數字 |
-| 客戶名稱、成效數字、證言 | 沒有真實來源一律不寫 |
-| 他人商標、Logo | 不放；只放使用者自己的單位 |
+| Simulated data | Persistent "Demo · simulated data" tag while product is on screen; repeat in end-card small print |
+| Example coefficients | Footnote "*Example factor ___, illustration only" on the formula card |
+| Unbuilt features | Only in the "next / roadmap" scene, phrased as next/connectable |
+| Dramatized hook numbers | Allowed, but tell the user at delivery |
+| Customers, results, testimonials | Never without a real source |
+| Third-party logos | Don't; only the user's own org |
 
-## 5. 聲音
+## 5. Voice
+- English enterprise: `Charon` (measured) or `Aoede` (bright) + "keynote narrator: calm, professional, confident, medium-slow, natural pauses, no announcer voice".
+- Taiwanese Mandarin: `Leda` + "請用台灣口音的華語…".
+- Per-scene `dir` only states differences: hook "low, suspenseful"; reveal "brighter"; scenarios "crisp questions, slow down on the last line"; outro "slow, certain".
 
-- 企業版：`Leda` ＋ style「科技品牌發表會的旁白：沉穩、專業、有自信的年輕女性，咬字清楚，語速中等偏慢，句與句之間有自然停頓。不要播音腔，不要誇張。」
-- 男聲：`Puck`（活潑）或 `Charon`（知性）。一定寫「台灣口音的華語」。
-- 每場的 `dir` 只寫差異：開場「低沉、帶懸念」、登場「語氣轉亮」、情境「問句俐落，最後一句放慢加重」、收尾「放慢、篤定」。
-
-## 6. 範例
-
-完整台詞見 `examples/cnc-twin/script.json`（CNC 工廠數位孿生，企業客戶，90.6 秒）。
+## 6. Example
+See `examples/cnc-twin/script.json` (Traditional Chinese, 90.6 s, enterprise).
